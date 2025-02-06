@@ -40,7 +40,7 @@ public class StoryEntity extends AbstractEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "story")
     Set<FavoriteEntity> favorites = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "tbl_story_generate",
             joinColumns = @JoinColumn(name = "story_id"),

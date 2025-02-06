@@ -20,6 +20,13 @@ public enum ErrorCode {
     UNAUTHENTICATED(1003, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1004, "You do not have permission", HttpStatus.FORBIDDEN),
     USER_ALREADY_ACTIVE(1005, "User already active account", HttpStatus.BAD_REQUEST),
+
+    STORY_ALREADY_EXITS(1111, "Story is existed in your database.", HttpStatus.BAD_REQUEST),
+    STORY_NOT_EXITS(1112, "Story is not existed in your database.", HttpStatus.BAD_REQUEST),
+
+    GENERATE_ALREADY_EXITS(1121, "Generate is existed in your database.", HttpStatus.BAD_REQUEST),
+    GENERATE_NOT_EXITS(1122, "Generate is not existed in your database.", HttpStatus.BAD_REQUEST),
+
     ;
 
     ErrorCode(int code, String message, HttpStatusCode httpStatusCode) {

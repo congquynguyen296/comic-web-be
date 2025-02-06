@@ -19,7 +19,9 @@ public class SecurityConfig {
             "/auth/register",
             "/auth/active-account",
             "/auth/resend-otp",
-            "/users"
+            "/users",
+            "/story",
+            "/generate",
     };
 
     @Bean

@@ -1,9 +1,6 @@
 package com.nettruyen.comic.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -22,9 +19,12 @@ public class GenerateEntity extends AbstractEntity {
     @Column(name = "name")
     String name;
 
+    @Column(name = "code")
+    String code;
+
     @Column(name = "description")
     String description;
 
-    @ManyToMany(mappedBy = "generates")
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "generates")
     Set<StoryEntity> stories = new HashSet<>();
 }
