@@ -1,0 +1,50 @@
+package com.nettruyen.comic.entity;
+
+import com.nettruyen.comic.constant.StatusEnum;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+import java.util.HashSet;
+import java.util.Set;
+
+
+@Entity(name = "tbl_story")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class StoryEntity extends AbstractEntity {
+
+    @Column(name = "title")
+    String title;
+
+    @Column(name = "author")
+    String author;
+
+    @Column(name = "description")
+    String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    StatusEnum status;
+
+    @Column(name = "cover_image")
+    String coverImage;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "story")
+    Set<ChapterEntity> chapters = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "story")
+    Set<FavoriteEntity> favorites = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "tbl_story_generate",
+            joinColumns = @JoinColumn(name = "story_id"),
+            inverseJoinColumns = @JoinColumn(name = "generate_id")
+    )
+    Set<GenerateEntity> generates = new HashSet<>();
+}
