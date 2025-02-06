@@ -3,20 +3,18 @@ package com.nettruyen.comic.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.nettruyen.comic.dto.request.GenerateAddedRequest;
-import com.nettruyen.comic.dto.request.StoryAddedRequest;
+import com.nettruyen.comic.dto.request.GenerateUpdateRequest;
+import com.nettruyen.comic.dto.request.StoryUpdateRequest;
 import com.nettruyen.comic.dto.response.ApiResponse;
-import com.nettruyen.comic.dto.response.GenerateAddedResponse;
-import com.nettruyen.comic.dto.response.StoryAddedResponse;
+import com.nettruyen.comic.dto.response.GenerateResponse;
+import com.nettruyen.comic.dto.response.StoryResponse;
 import com.nettruyen.comic.service.IGenerateService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -29,10 +27,27 @@ public class GenerateController {
     IGenerateService generateService;
 
     @PostMapping()
-    ApiResponse<GenerateAddedResponse> createStory(@RequestBody @Valid GenerateAddedRequest generateAddedRequest) {
-        return ApiResponse.<GenerateAddedResponse>builder()
+    ApiResponse<GenerateResponse> createStory(@RequestBody @Valid GenerateAddedRequest generateAddedRequest) {
+        return ApiResponse.<GenerateResponse>builder()
                 .code(200)
                 .result(generateService.createGenerate(generateAddedRequest))
+                .build();
+    }
+
+    @PutMapping()
+    ApiResponse<GenerateResponse> updateStory(@RequestBody @Valid GenerateUpdateRequest generateUpdateRequest) {
+        return ApiResponse.<GenerateResponse>builder()
+                .code(200)
+                .result(generateService.updateGenerate(generateUpdateRequest))
+                .build();
+    }
+
+    @DeleteMapping()
+    ApiResponse<Void> deleteStory(@RequestParam String code) {
+        generateService.deleteGenerate(code);
+        return ApiResponse.<Void>builder()
+                .code(200)
+                .message("Deleted generate completed")
                 .build();
     }
 }

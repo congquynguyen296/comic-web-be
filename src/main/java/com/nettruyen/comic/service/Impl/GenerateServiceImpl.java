@@ -1,19 +1,17 @@
 package com.nettruyen.comic.service.Impl;
 
 import com.nettruyen.comic.dto.request.GenerateAddedRequest;
-import com.nettruyen.comic.dto.request.StoryAddedRequest;
-import com.nettruyen.comic.dto.response.GenerateAddedResponse;
-import com.nettruyen.comic.dto.response.StoryAddedResponse;
+import com.nettruyen.comic.dto.request.GenerateUpdateRequest;
+import com.nettruyen.comic.dto.response.GenerateResponse;
 import com.nettruyen.comic.entity.GenerateEntity;
 import com.nettruyen.comic.entity.StoryEntity;
 import com.nettruyen.comic.exception.AppException;
 import com.nettruyen.comic.exception.ErrorCode;
 import com.nettruyen.comic.mapper.GenerateMapper;
-import com.nettruyen.comic.mapper.StoryMapper;
 import com.nettruyen.comic.repository.IGenerateRepository;
 import com.nettruyen.comic.repository.IStoryRepository;
 import com.nettruyen.comic.service.IGenerateService;
-import com.nettruyen.comic.service.IStoryService;
+import com.nettruyen.comic.util.ConvertorUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -37,13 +35,13 @@ public class GenerateServiceImpl implements IGenerateService {
 
 
     @Override
-    public GenerateAddedResponse createGenerate(GenerateAddedRequest generateAddedRequest) {
+    public GenerateResponse createGenerate(GenerateAddedRequest generateAddedRequest) {
 
         if (generateRepository.findByName(generateAddedRequest.getName()) != null)
             throw new AppException(ErrorCode.GENERATE_ALREADY_EXITS);
 
         GenerateEntity generateEntity = generateMapper.toEntity(generateAddedRequest);
-        generateEntity.setCode(convertNameToCode(generateAddedRequest.getName()));
+        generateEntity.setCode(ConvertorUtil.convertNameToCode(generateAddedRequest.getName()));
 
         try {
 
@@ -58,7 +56,7 @@ public class GenerateServiceImpl implements IGenerateService {
 
             generateEntity.setStories(storiesOfEntity);
             GenerateEntity newGenerate = generateRepository.save(generateEntity);
-            GenerateAddedResponse result = generateMapper.toResponse(newGenerate);
+            GenerateResponse result = generateMapper.toResponse(newGenerate);
 
             // Map lại tên các truyện thuộc thể loại này
             Set<String> storiesOfResponse = newGenerate.getStories().stream()
@@ -74,13 +72,56 @@ public class GenerateServiceImpl implements IGenerateService {
         }
     }
 
-    private String convertNameToCode(String name) {
+    @Override
+    public GenerateResponse updateGenerate(GenerateUpdateRequest request) {
 
-        String withoutAccents = Normalizer.normalize(name, Normalizer.Form.NFD);
-        withoutAccents = withoutAccents.replaceAll("\\p{InCombiningDiacriticalMarks}", "");
+        try {
 
-        return name.isEmpty()
-                ? "unknown"
-                : withoutAccents.trim().toLowerCase().replaceAll("\\s+", "-");
+            GenerateEntity generateExisted = generateRepository.findById(request.getId())
+                    .orElseThrow(() -> new AppException(ErrorCode.GENERATE_NOT_EXITS));
+
+            if (generateExisted != null) {
+
+                // Giữ lại list story cũ
+                Set<StoryEntity> oldStories = generateExisted.getStories();
+
+                // Update info
+                generateMapper.updateEntity(generateExisted, request);
+                generateExisted.setStories(oldStories);
+                generateExisted.setCode(ConvertorUtil.convertNameToCode(generateExisted.getName()));
+
+                generateRepository.save(generateExisted);
+
+                GenerateResponse result = generateMapper.toResponse(generateExisted);
+                result.setStories(generateExisted.getStories().stream()
+                        .map(StoryEntity::getTitle)
+                        .collect(Collectors.toSet()));
+
+                return result;
+            }
+
+            return null;
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new AppException(ErrorCode.UNCATEGORIZED);
+        }
+    }
+
+    @Override
+    public void deleteGenerate(String storyId) {
+
+        try {
+
+            GenerateEntity generateExisted = generateRepository.findById(storyId)
+                    .orElseThrow(() -> new AppException(ErrorCode.GENERATE_NOT_EXITS));
+
+            generateRepository.delete(generateExisted);
+
+            log.info("Deleted generate {}", generateExisted.getName());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new AppException(ErrorCode.UNCATEGORIZED);
+        }
     }
 }

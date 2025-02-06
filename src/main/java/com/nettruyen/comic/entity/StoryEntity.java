@@ -24,6 +24,9 @@ public class StoryEntity extends AbstractEntity {
     @Column(name = "author")
     String author;
 
+    @Column(name = "code")
+    String code;
+
     @Column(name = "description")
     String description;
 

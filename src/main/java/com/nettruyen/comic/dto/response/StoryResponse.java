@@ -1,5 +1,6 @@
 package com.nettruyen.comic.dto.response;
 
+import com.nettruyen.comic.constant.StatusEnum;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -12,17 +13,25 @@ import java.util.Set;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class GenerateAddedResponse {
+public class StoryResponse {
 
-    String name;
+    String id;
 
-    String description;
+    String title;
 
     String code;
 
-    Set<String> stories = new HashSet<>();
+    String author;
+
+    String description;
+
+    StatusEnum status;
+
+    String coverImage;
 
     Date createdAt;
 
     Date updatedAt;
+
+    Set<String> generates = new HashSet<>();
 }

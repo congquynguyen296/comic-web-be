@@ -30,6 +30,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
+                        .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINT).permitAll()
+                        .requestMatchers(HttpMethod.PUT, PUBLIC_ENDPOINT).permitAll()
                         .anyRequest()
                         .authenticated());
 

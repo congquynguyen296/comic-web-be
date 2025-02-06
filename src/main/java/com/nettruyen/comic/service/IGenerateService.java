@@ -1,9 +1,14 @@
 package com.nettruyen.comic.service;
 
 import com.nettruyen.comic.dto.request.GenerateAddedRequest;
-import com.nettruyen.comic.dto.response.GenerateAddedResponse;
+import com.nettruyen.comic.dto.request.GenerateUpdateRequest;
+import com.nettruyen.comic.dto.response.GenerateResponse;
 
 public interface IGenerateService {
 
-    GenerateAddedResponse createGenerate(GenerateAddedRequest request);
+    GenerateResponse createGenerate(GenerateAddedRequest request);
+
+    GenerateResponse updateGenerate(GenerateUpdateRequest request);
+
+    void deleteGenerate(String storyId);
 }

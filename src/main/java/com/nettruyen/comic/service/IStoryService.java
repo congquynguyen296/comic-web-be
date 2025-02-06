@@ -1,11 +1,16 @@
 package com.nettruyen.comic.service;
 
 import com.nettruyen.comic.dto.request.StoryAddedRequest;
-import com.nettruyen.comic.dto.response.StoryAddedResponse;
+import com.nettruyen.comic.dto.request.StoryUpdateRequest;
+import com.nettruyen.comic.dto.response.StoryResponse;
 
 public interface IStoryService {
 
-    StoryAddedResponse createStory(StoryAddedRequest storyAddedRequest);
+    StoryResponse createStory(StoryAddedRequest storyAddedRequest);
 
-    StoryAddedResponse getStoryById(String storyId);
+    StoryResponse getStoryById(String storyId);
+
+    StoryResponse updateStory(StoryUpdateRequest storyUpdateRequest);
+
+    void deleteStory(String storyId);
 }
