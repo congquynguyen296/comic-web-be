@@ -4,6 +4,8 @@ import com.nettruyen.comic.dto.request.StoryAddedRequest;
 import com.nettruyen.comic.dto.request.StoryUpdateRequest;
 import com.nettruyen.comic.dto.response.StoryResponse;
 
+import java.util.List;
+
 public interface IStoryService {
 
     StoryResponse createStory(StoryAddedRequest storyAddedRequest);
@@ -13,4 +15,8 @@ public interface IStoryService {
     StoryResponse updateStory(StoryUpdateRequest storyUpdateRequest);
 
     void deleteStory(String storyId);
+
+    List<StoryResponse> getAllStory();
+
+    List<StoryResponse> getAllStory(int pageNo, int pageSize);
 }

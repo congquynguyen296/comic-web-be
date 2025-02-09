@@ -13,6 +13,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/story")
@@ -46,6 +48,17 @@ public class StoryController {
         return ApiResponse.<Void>builder()
                 .code(200)
                 .message("Deleted story completed")
+                .build();
+    }
+
+    @GetMapping
+    ApiResponse<List<StoryResponse>> getAllStory(
+            @RequestParam(defaultValue = "0", required = false) int pageNo,
+            @RequestParam(defaultValue = "5", required = false) int pageSize) {
+
+        return ApiResponse.<List<StoryResponse>>builder()
+                .code(200)
+                .result(storyService.getAllStory(pageNo, pageSize))
                 .build();
     }
 }

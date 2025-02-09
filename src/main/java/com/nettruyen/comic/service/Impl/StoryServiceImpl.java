@@ -18,9 +18,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -139,5 +144,62 @@ public class StoryServiceImpl implements IStoryService {
             log.error(e.getMessage());
             throw new AppException(ErrorCode.UNCATEGORIZED);
         }
+    }
+
+    @Override
+    public List<StoryResponse> getAllStory() {
+        return List.of();
+    }
+
+//    @Override
+//    public List<StoryResponse> getAllStory(int pageNo, int pageSize) {
+//
+//        Pageable pageable = PageRequest.of(pageNo, pageSize);
+//        Page<StoryEntity> storyEntities = storyRepository.findAll(pageable);
+//
+//        List<StoryResponse> storyResponses = new ArrayList<>();
+//        for (StoryEntity story : storyEntities) {
+//
+//            StoryResponse response = storyMapper.toResponse(story);
+//
+//            Set<String> generateNames = new HashSet<>();
+//            for (GenerateEntity generate : story.getGenerates()) {
+//                generateNames.add(generate.getName());
+//            }
+//
+//            response.setGenerates(generateNames);
+//
+//            storyResponses.add(response);
+//        }
+//
+//        return storyResponses;
+//    }
+
+
+    @Override
+    public List<StoryResponse> getAllStory(int pageNo, int pageSize) {
+
+        int adjustedPageNo = (pageNo - 1) > 0
+                ? (pageNo - 1)
+                : pageNo;
+
+        Pageable pageable = PageRequest.of(adjustedPageNo, pageSize);
+        Page<StoryEntity> stories = storyRepository.findAll(pageable);
+
+        return stories.stream().map(story -> {
+
+            StoryResponse storyResponse = storyMapper.toResponse(story);
+
+            // Set generate cho từng storyResponse
+            storyResponse.setGenerates(
+                    story.getGenerates().stream()
+                            .map(GenerateEntity::getName)
+                            .collect(Collectors.toSet())
+            );
+
+            return storyResponse;
+        }).toList();
+
+        // Có thể tận dụng .parallelStream() để tăng tốc
     }
 }
