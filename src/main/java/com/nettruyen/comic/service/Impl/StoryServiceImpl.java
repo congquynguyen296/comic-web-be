@@ -148,6 +148,34 @@ public class StoryServiceImpl implements IStoryService {
 
     @Override
     public List<StoryResponse> getAllStory() {
+
+        try {
+
+            List<StoryEntity> stories = storyRepository.findAll();
+            if (!stories.isEmpty()) {
+
+                return stories.stream().map(story -> {
+
+                    StoryResponse storyResponse = storyMapper.toResponse(story);
+
+                    // Map name generate
+                    storyResponse.setGenerates(story.getGenerates().stream()
+                            .map(GenerateEntity::getName)
+                            .collect(Collectors.toSet()));
+
+                    return storyResponse;
+
+                }).toList();
+
+            } else {
+                log.error("Stories is empty");
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new AppException(ErrorCode.UNCATEGORIZED);
+        }
+
         return List.of();
     }
 

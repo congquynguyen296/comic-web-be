@@ -61,4 +61,13 @@ public class StoryController {
                 .result(storyService.getAllStory(pageNo, pageSize))
                 .build();
     }
+
+    @GetMapping()
+    ApiResponse<List<StoryResponse>> getAllStory() {
+
+        return ApiResponse.<List<StoryResponse>>builder()
+                .code(200)
+                .result(storyService.getAllStory())
+                .build();
+    }
 }

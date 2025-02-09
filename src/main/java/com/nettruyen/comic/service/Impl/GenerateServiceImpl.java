@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.Normalizer;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -123,5 +124,37 @@ public class GenerateServiceImpl implements IGenerateService {
             log.error(e.getMessage());
             throw new AppException(ErrorCode.UNCATEGORIZED);
         }
+    }
+
+    @Override
+    public List<GenerateResponse> getAllGenerate() {
+
+        try {
+
+            List<GenerateEntity> generates = generateRepository.findAll();
+            if (!generates.isEmpty()) {
+
+                return generates.stream().map(generate -> {
+                    GenerateResponse generateResponse = generateMapper.toResponse(generate);
+
+                    // Lấy tất cả code theo từng thể loại truyện
+                    // Hiện chỉ cần lấy code để xem (tiện cho việc get story theo code sau này)
+                    generateResponse.setStories(generate.getStories().stream()
+                            .map(StoryEntity::getCode)
+                            .collect(Collectors.toSet()));
+
+                    return generateResponse;
+                }).toList();
+
+            } else {
+                log.error("Empty generate list");
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new AppException(ErrorCode.UNCATEGORIZED);
+        }
+
+        return List.of();
     }
 }

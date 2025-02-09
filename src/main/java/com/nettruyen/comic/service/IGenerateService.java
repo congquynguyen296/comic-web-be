@@ -4,6 +4,8 @@ import com.nettruyen.comic.dto.request.GenerateAddedRequest;
 import com.nettruyen.comic.dto.request.GenerateUpdateRequest;
 import com.nettruyen.comic.dto.response.GenerateResponse;
 
+import java.util.List;
+
 public interface IGenerateService {
 
     GenerateResponse createGenerate(GenerateAddedRequest request);
@@ -11,4 +13,6 @@ public interface IGenerateService {
     GenerateResponse updateGenerate(GenerateUpdateRequest request);
 
     void deleteGenerate(String storyId);
+
+    List<GenerateResponse> getAllGenerate();
 }
