@@ -3,6 +3,7 @@ package com.nettruyen.comic.service;
 import com.nettruyen.comic.dto.request.StoryAddedRequest;
 import com.nettruyen.comic.dto.request.StoryUpdateRequest;
 import com.nettruyen.comic.dto.response.StoryResponse;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -18,5 +19,5 @@ public interface IStoryService {
 
     List<StoryResponse> getAllStory();
 
-    List<StoryResponse> getAllStory(int pageNo, int pageSize);
+    Page<StoryResponse> getAllStory(int pageNo, int pageSize);
 }

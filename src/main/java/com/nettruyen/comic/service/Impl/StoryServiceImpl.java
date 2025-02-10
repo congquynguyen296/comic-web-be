@@ -205,16 +205,14 @@ public class StoryServiceImpl implements IStoryService {
 
 
     @Override
-    public List<StoryResponse> getAllStory(int pageNo, int pageSize) {
+    public Page<StoryResponse> getAllStory(int pageNo, int pageSize) {
 
-        int adjustedPageNo = (pageNo - 1) > 0
-                ? (pageNo - 1)
-                : pageNo;
+        int adjustedPageNo = (pageNo > 0) ? pageNo - 1 : 0;
 
         Pageable pageable = PageRequest.of(adjustedPageNo, pageSize);
         Page<StoryEntity> stories = storyRepository.findAll(pageable);
 
-        return stories.stream().map(story -> {
+        return stories.map(story -> {
 
             StoryResponse storyResponse = storyMapper.toResponse(story);
 
@@ -226,7 +224,7 @@ public class StoryServiceImpl implements IStoryService {
             );
 
             return storyResponse;
-        }).toList();
+        });
 
         // Có thể tận dụng .parallelStream() để tăng tốc
     }
