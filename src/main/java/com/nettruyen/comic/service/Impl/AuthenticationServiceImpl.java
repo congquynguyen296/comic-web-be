@@ -5,6 +5,7 @@ import com.nettruyen.comic.dto.request.LoginRequest;
 import com.nettruyen.comic.dto.request.UserCreationRequest;
 import com.nettruyen.comic.dto.response.AuthenticationResponse;
 import com.nettruyen.comic.dto.response.ResendOtpResponse;
+import com.nettruyen.comic.entity.RoleEntity;
 import com.nettruyen.comic.entity.UserEntity;
 import com.nettruyen.comic.exception.AppException;
 import com.nettruyen.comic.exception.ErrorCode;
@@ -13,12 +14,23 @@ import com.nettruyen.comic.repository.IUserRepository;
 import com.nettruyen.comic.service.IAuthenticationService;
 import com.nettruyen.comic.service.IAccountService;
 import com.nettruyen.comic.util.OtpGenerator;
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -31,8 +43,17 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     PasswordEncoder passwordEncoder;
     IAccountService accountService;
 
+
+    static final long VALID_DURATION = 3600;    // Thgian hợp lệ của 1 token
+
+    @NonFinal
+    @Value("${jwt.signerKey}")
+    String SIGNER_KEY;
+
     @Override
     public AuthenticationResponse login(LoginRequest request) {
+
+        log.info("SignerKey: {}", SIGNER_KEY);
 
         UserEntity user = userRepository.findByUsername(request.getUsername());
         if (user == null)
@@ -42,8 +63,12 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         if (!authenticated)
             throw new AppException(ErrorCode.UNAUTHENTICATED);
 
+        // Generate token when authenticate success
+        String token = generateToken(user);
+
         return AuthenticationResponse.builder()
                 .isActive((user.getIsActive() == null || user.getIsActive() == 0) ? 0 : 1)
+                .token(token)
                 .message("Login successful with " + user.getUsername())
                 .build();
     }
@@ -153,4 +178,44 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             throw new AppException(ErrorCode.UNCATEGORIZED);
         }
     }
+
+
+    /* === Authentication for JWT === */
+
+    // Generate token
+    private String generateToken(UserEntity userEntity) {
+
+        // Header
+        JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
+
+        // Payload: Data contain in body - claim
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                .subject(userEntity.getUsername())
+                .issuer("Q.comic - Admin")
+                .issueTime(new Date())
+                .expirationTime(Date.from(Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS)))
+                .claim("scope", buildScope(userEntity))
+                .jwtID(UUID.randomUUID().toString())
+                .build();
+        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
+        JWSObject jwsObject = new JWSObject(jwsHeader, payload);
+
+
+        try {
+            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
+            return jwsObject.serialize();
+        } catch (JOSEException e) {
+            log.error(e.getMessage());
+            throw new AppException(ErrorCode.UNCATEGORIZED);
+        }
+    }
+
+    // Build scope for claim - scope in body of token
+    private String buildScope(UserEntity userEntity) {
+        return userEntity.getRoles().stream()
+                .map(role -> role.getRoleName().name()) // Convert enum thành string
+                .collect(Collectors.joining(","));
+    }
+
+    //
 }

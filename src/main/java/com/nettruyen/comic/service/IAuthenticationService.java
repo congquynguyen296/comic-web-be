@@ -5,7 +5,6 @@ import com.nettruyen.comic.dto.request.LoginRequest;
 import com.nettruyen.comic.dto.request.UserCreationRequest;
 import com.nettruyen.comic.dto.response.AuthenticationResponse;
 import com.nettruyen.comic.dto.response.ResendOtpResponse;
-import com.nettruyen.comic.dto.response.UserResponse;
 
 public interface IAuthenticationService {
 

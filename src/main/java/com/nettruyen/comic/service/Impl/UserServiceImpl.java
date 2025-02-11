@@ -1,11 +1,14 @@
 package com.nettruyen.comic.service.Impl;
 
+import com.nettruyen.comic.constant.RoleEnum;
 import com.nettruyen.comic.dto.request.UserCreationRequest;
 import com.nettruyen.comic.dto.response.UserResponse;
+import com.nettruyen.comic.entity.RoleEntity;
 import com.nettruyen.comic.entity.UserEntity;
 import com.nettruyen.comic.exception.AppException;
 import com.nettruyen.comic.exception.ErrorCode;
 import com.nettruyen.comic.mapper.UserMapper;
+import com.nettruyen.comic.repository.IRoleRepository;
 import com.nettruyen.comic.repository.IUserRepository;
 import com.nettruyen.comic.service.IUserService;
 import lombok.AccessLevel;
@@ -15,7 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -25,6 +31,7 @@ public class UserServiceImpl implements IUserService {
 
     UserMapper userMapper;
     IUserRepository userRepository;
+    IRoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
 
     @Override
@@ -33,11 +40,24 @@ public class UserServiceImpl implements IUserService {
         if (userRepository.findByUsername(request.getUsername()) != null)
             throw new AppException(ErrorCode.USER_EXISTED);
 
+        // Map các thông tin cần thiết
         UserEntity userEntity = userMapper.toUserEntity(request);
         userEntity.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        Set<RoleEntity> roles = new HashSet<>();
+        roleRepository.findByRoleName(RoleEnum.USER).ifPresent(roles::add);
+        userEntity.setRoles(roles);
+
         try {
-            var user = userRepository.save(userEntity);
-            return userMapper.toUserResponse(user);
+            var newUser = userRepository.save(userEntity);
+
+            // Map lại set role
+            var result = userMapper.toUserResponse(newUser);
+            result.setRoles(newUser.getRoles().stream()
+                    .map(RoleEntity::getRoleName)
+                    .collect(Collectors.toSet()));
+            return result;
+
         } catch (Exception e) {
             throw new AppException(ErrorCode.UNCATEGORIZED);
         }
@@ -60,6 +80,9 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public List<UserResponse> findAllUsers() {
+
+
+
         return List.of();
     }
 }

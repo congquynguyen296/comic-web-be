@@ -13,16 +13,12 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINT = {
-            "/auth/login",
-            "/auth/forgot-password",
-            "/auth/logout",
-            "/auth/register",
-            "/auth/active-account",
-            "/auth/resend-otp",
+            "/auth/**",
             "/users/**",
             "/story/**",
             "/generate/**",
             "/stories/**",
+            "/role/**"
     };
 
     @Bean

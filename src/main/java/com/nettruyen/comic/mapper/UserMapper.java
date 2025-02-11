@@ -10,7 +10,10 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
+    // Role sẽ được map ở service
+    @Mapping(target = "roles", ignore = true)
     UserEntity toUserEntity(UserCreationRequest userCreationRequest);
 
+    @Mapping(target = "roles", ignore = true)
     UserResponse toUserResponse(UserEntity userEntity);
 }

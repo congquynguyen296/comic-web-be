@@ -1,9 +1,11 @@
 package com.nettruyen.comic.dto.response;
 
+import com.nettruyen.comic.constant.RoleEnum;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -19,4 +21,5 @@ public class UserResponse {
     String email;
     LocalDate dob;
     Integer isActive;
+    Set<RoleEnum> roles;
 }

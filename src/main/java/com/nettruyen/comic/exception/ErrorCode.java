@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatusCode;
 public enum ErrorCode {
     USER_NOT_EXISTED(1000, "User is not exists", HttpStatus.NOT_FOUND),
     USER_EXISTED(1000, "User already exists", HttpStatus.BAD_REQUEST),
+    ROLE_NOT_EXISTED(1000, "Role is not exists", HttpStatus.NOT_FOUND),
+    ROLE_EXISTED(1000, "Role already exists", HttpStatus.BAD_REQUEST),
     EMAIL_EXISTED(1000, "Email already exists", HttpStatus.BAD_REQUEST),
     INVALID_OTP_OR_EXPIRED(1003, "OTP code is invalid or expired", HttpStatus.BAD_REQUEST),
     UNCATEGORIZED(9999, "Uncategorized", HttpStatus.INTERNAL_SERVER_ERROR),

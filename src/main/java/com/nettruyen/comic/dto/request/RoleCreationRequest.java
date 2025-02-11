@@ -1,5 +1,6 @@
-package com.nettruyen.comic.dto.response;
+package com.nettruyen.comic.dto.request;
 
+import com.nettruyen.comic.constant.RoleEnum;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -8,8 +9,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class AuthenticationResponse {
-    Integer isActive;
-    String token;
-    String message;
+public class RoleCreationRequest {
+    RoleEnum roleName;
 }
