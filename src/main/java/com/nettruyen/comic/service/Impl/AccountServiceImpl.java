@@ -44,7 +44,7 @@ public class AccountServiceImpl implements IAccountService {
 
     @Override
     public void saveOtp(String email, String otp) {
-        redisTemplate.opsForValue().set(getRedisKey(email), otp, Duration.ofMinutes(3));
+        redisTemplate.opsForValue().set(getRedisKey(email), otp, Duration.ofMinutes(10));
     }
 
     private String getRedisKey(String email) {

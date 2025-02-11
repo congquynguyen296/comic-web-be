@@ -2,9 +2,11 @@ package com.nettruyen.comic.service;
 
 import com.nettruyen.comic.dto.request.ActiveAccountRequest;
 import com.nettruyen.comic.dto.request.LoginRequest;
+import com.nettruyen.comic.dto.request.RegisterRequest;
 import com.nettruyen.comic.dto.request.UserCreationRequest;
 import com.nettruyen.comic.dto.response.AuthenticationResponse;
 import com.nettruyen.comic.dto.response.ResendOtpResponse;
+import com.nettruyen.comic.dto.response.UserResponse;
 
 public interface IAuthenticationService {
 
@@ -14,7 +16,7 @@ public interface IAuthenticationService {
 
     ResendOtpResponse resendOtp(ActiveAccountRequest request);
 
-    String activeAccount(ActiveAccountRequest request);
+    UserResponse activeAccount(ActiveAccountRequest request);
 
-    String register(UserCreationRequest request);
+    UserResponse register(RegisterRequest request);
 }

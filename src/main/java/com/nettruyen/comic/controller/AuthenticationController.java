@@ -3,6 +3,7 @@ package com.nettruyen.comic.controller;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.nettruyen.comic.dto.request.ActiveAccountRequest;
 import com.nettruyen.comic.dto.request.LoginRequest;
+import com.nettruyen.comic.dto.request.RegisterRequest;
 import com.nettruyen.comic.dto.request.UserCreationRequest;
 import com.nettruyen.comic.dto.response.ApiResponse;
 import com.nettruyen.comic.dto.response.AuthenticationResponse;
@@ -29,16 +30,17 @@ public class AuthenticationController {
     IAuthenticationService authenticationService;
 
     @PostMapping("/register")
-    ApiResponse<String> register(@RequestBody @Valid UserCreationRequest request) {
-        return ApiResponse.<String>builder()
+    ApiResponse<UserResponse> register(@RequestBody @Valid RegisterRequest request) {
+        return ApiResponse.<UserResponse>builder()
                 .code(200)
+                .message("Đăng ký thành công với Q.comic. Vui lòng xác nhận qua email trong vòng 10 phút.")
                 .result(authenticationService.register(request))
                 .build();
     }
 
     @PostMapping("/active-account")
-    ApiResponse<String> activeAccount(@RequestBody ActiveAccountRequest request) {
-        return ApiResponse.<String>builder()
+    ApiResponse<UserResponse> activeAccount(@RequestBody ActiveAccountRequest request) {
+        return ApiResponse.<UserResponse>builder()
                 .code(200)
                 .result(authenticationService.activeAccount(request))
                 .build();
