@@ -11,4 +11,5 @@ import lombok.experimental.FieldDefaults;
 public class ActiveAccountRequest {
     String email;
     String otpCode;
+    String token;
 }

@@ -1,6 +1,7 @@
 package com.nettruyen.comic.service.Impl;
 
 import com.nettruyen.comic.service.IAccountService;
+import com.nettruyen.comic.service.IRedisService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,6 +21,8 @@ public class AccountServiceImpl implements IAccountService {
 
     JavaMailSender mailSender;
     RedisTemplate<String, Object> redisTemplate;
+
+    IRedisService redisService;
 
     @Override
     public void sendEmail(String toEmail, String subject, String body) {

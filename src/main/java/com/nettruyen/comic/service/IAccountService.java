@@ -7,4 +7,5 @@ public interface IAccountService {
     boolean validateOtp(String email, String otp);
 
     void saveOtp(String email, String otp);
+
 }

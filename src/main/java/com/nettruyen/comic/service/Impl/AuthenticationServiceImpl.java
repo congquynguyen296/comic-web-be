@@ -68,7 +68,8 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         if (user == null)
             throw new AppException(ErrorCode.USER_NOT_EXISTED);
 
-        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword())
+                && user.getIsActive() == 1;
         if (!authenticated)
             throw new AppException(ErrorCode.UNAUTHENTICATED);
 
@@ -211,8 +212,9 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         try {
             var newUser = userRepository.save(userEntity);
 
-            // Tạo otp và lưu vào redis
+            // Tạo otp + token và lưu vào redis
             String otpCode = OtpGenerator.generateOtp();
+            String token = UUID.randomUUID().toString();
             accountService.saveOtp(newUser.getEmail(), otpCode);
 
             // Send otp qua email

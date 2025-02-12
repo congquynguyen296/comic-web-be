@@ -1,5 +1,8 @@
 package com.nettruyen.comic.configuration;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINT = {
@@ -21,6 +26,9 @@ public class SecurityConfig {
             "/role/**"
     };
 
+
+    // CustomAccessDeniedHandler customAccessDeniedHandler;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -29,8 +37,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINT).permitAll()
                         .requestMatchers(HttpMethod.PUT, PUBLIC_ENDPOINT).permitAll()
-                        .anyRequest()
-                        .authenticated());
+                        .requestMatchers("/admin/**").hasAuthority("SCOPE_ADMIN")
+                        .anyRequest().authenticated()
+                );
+                // .exceptionHandling(ex -> ex.accessDeniedHandler(customAccessDeniedHandler));
 
         return http.build();
     }
