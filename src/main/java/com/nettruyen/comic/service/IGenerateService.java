@@ -1,7 +1,7 @@
 package com.nettruyen.comic.service;
 
-import com.nettruyen.comic.dto.request.GenerateAddedRequest;
-import com.nettruyen.comic.dto.request.GenerateUpdateRequest;
+import com.nettruyen.comic.dto.request.generate.GenerateAddedRequest;
+import com.nettruyen.comic.dto.request.generate.GenerateUpdateRequest;
 import com.nettruyen.comic.dto.response.GenerateResponse;
 
 import java.util.List;

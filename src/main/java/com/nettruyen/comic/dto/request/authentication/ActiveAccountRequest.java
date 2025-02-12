@@ -1,4 +1,4 @@
-package com.nettruyen.comic.dto.request;
+package com.nettruyen.comic.dto.request.authentication;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,15 +8,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class RegisterRequest {
-
-    String username;
-
-    String password;
-
-    String confirmPassword;
-
+public class ActiveAccountRequest {
     String email;
-
-    boolean termsAccepted;
+    String otpCode;
 }

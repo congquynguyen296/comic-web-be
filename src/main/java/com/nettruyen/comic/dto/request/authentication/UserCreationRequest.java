@@ -1,4 +1,4 @@
-package com.nettruyen.comic.dto.request;
+package com.nettruyen.comic.dto.request.authentication;
 
 import com.nettruyen.comic.validation.MinAge;
 import com.nettruyen.comic.validation.ValidEmail;

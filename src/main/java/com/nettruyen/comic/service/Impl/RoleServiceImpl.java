@@ -1,7 +1,7 @@
 package com.nettruyen.comic.service.Impl;
 
 import com.nettruyen.comic.constant.RoleEnum;
-import com.nettruyen.comic.dto.request.RoleCreationRequest;
+import com.nettruyen.comic.dto.request.authentication.RoleCreationRequest;
 import com.nettruyen.comic.entity.RoleEntity;
 import com.nettruyen.comic.exception.AppException;
 import com.nettruyen.comic.exception.ErrorCode;

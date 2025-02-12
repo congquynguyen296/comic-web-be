@@ -1,17 +1,14 @@
 package com.nettruyen.comic.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.nettruyen.comic.dto.request.ActiveAccountRequest;
-import com.nettruyen.comic.dto.request.LoginRequest;
-import com.nettruyen.comic.dto.request.RegisterRequest;
-import com.nettruyen.comic.dto.request.UserCreationRequest;
+import com.nettruyen.comic.dto.request.authentication.ActiveAccountRequest;
+import com.nettruyen.comic.dto.request.authentication.LoginRequest;
+import com.nettruyen.comic.dto.request.authentication.RegisterRequest;
 import com.nettruyen.comic.dto.response.ApiResponse;
 import com.nettruyen.comic.dto.response.AuthenticationResponse;
 import com.nettruyen.comic.dto.response.ResendOtpResponse;
 import com.nettruyen.comic.dto.response.UserResponse;
-import com.nettruyen.comic.service.IAccountService;
 import com.nettruyen.comic.service.IAuthenticationService;
-import com.nettruyen.comic.service.IUserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

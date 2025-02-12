@@ -1,8 +1,8 @@
 package com.nettruyen.comic.service.Impl;
 
 import com.nettruyen.comic.constant.StatusEnum;
-import com.nettruyen.comic.dto.request.StoryAddedRequest;
-import com.nettruyen.comic.dto.request.StoryUpdateRequest;
+import com.nettruyen.comic.dto.request.story.StoryAddedRequest;
+import com.nettruyen.comic.dto.request.story.StoryUpdateRequest;
 import com.nettruyen.comic.dto.response.StoryResponse;
 import com.nettruyen.comic.entity.GenerateEntity;
 import com.nettruyen.comic.entity.StoryEntity;
@@ -17,14 +17,11 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -179,30 +176,6 @@ public class StoryServiceImpl implements IStoryService {
 
         return List.of();
     }
-
-//    @Override
-//    public List<StoryResponse> getAllStory(int pageNo, int pageSize) {
-//
-//        Pageable pageable = PageRequest.of(pageNo, pageSize);
-//        Page<StoryEntity> storyEntities = storyRepository.findAll(pageable);
-//
-//        List<StoryResponse> storyResponses = new ArrayList<>();
-//        for (StoryEntity story : storyEntities) {
-//
-//            StoryResponse response = storyMapper.toResponse(story);
-//
-//            Set<String> generateNames = new HashSet<>();
-//            for (GenerateEntity generate : story.getGenerates()) {
-//                generateNames.add(generate.getName());
-//            }
-//
-//            response.setGenerates(generateNames);
-//
-//            storyResponses.add(response);
-//        }
-//
-//        return storyResponses;
-//    }
 
 
     @Override

@@ -2,8 +2,8 @@ package com.nettruyen.comic.controller;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.nettruyen.comic.dto.request.GenerateAddedRequest;
-import com.nettruyen.comic.dto.request.GenerateUpdateRequest;
+import com.nettruyen.comic.dto.request.generate.GenerateAddedRequest;
+import com.nettruyen.comic.dto.request.generate.GenerateUpdateRequest;
 import com.nettruyen.comic.dto.response.ApiResponse;
 import com.nettruyen.comic.dto.response.GenerateResponse;
 import com.nettruyen.comic.service.IGenerateService;

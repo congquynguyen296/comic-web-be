@@ -1,10 +1,9 @@
 package com.nettruyen.comic.service.Impl;
 
 import com.nettruyen.comic.constant.RoleEnum;
-import com.nettruyen.comic.dto.request.ActiveAccountRequest;
-import com.nettruyen.comic.dto.request.LoginRequest;
-import com.nettruyen.comic.dto.request.RegisterRequest;
-import com.nettruyen.comic.dto.request.UserCreationRequest;
+import com.nettruyen.comic.dto.request.authentication.ActiveAccountRequest;
+import com.nettruyen.comic.dto.request.authentication.LoginRequest;
+import com.nettruyen.comic.dto.request.authentication.RegisterRequest;
 import com.nettruyen.comic.dto.response.AuthenticationResponse;
 import com.nettruyen.comic.dto.response.ResendOtpResponse;
 import com.nettruyen.comic.dto.response.UserResponse;
@@ -27,16 +26,18 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -74,6 +75,23 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         // Generate token when authenticate success
         String token = generateToken(user);
 
+        // Tạo một authentication thủ công, do Spring Security không tự động cập nhật SecurityContextHolder
+        List<GrantedAuthority> authorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
+                .collect(Collectors.toList());
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
+
+        // Gán cái vừa tạo cho SecurityContextHolder biết
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // Show info of user (contain in context of security context holder)
+        var contextAuthentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Username: {}", contextAuthentication.getName());
+        contextAuthentication.getAuthorities().forEach(grantedAuthority -> {
+            log.info("GrantedAuthority: {}", grantedAuthority);
+        });
+
         return AuthenticationResponse.builder()
                 .isActive((user.getIsActive() == null || user.getIsActive() == 0) ? 0 : 1)
                 .token(token)
@@ -81,7 +99,8 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 .build();
     }
 
-    @Override
+
+    @Override   // Chưa làm
     public String logout(String username) {
 
         // Logic cho logout sẽ ở đây (token - khi mở rộng hệ thống)
@@ -93,7 +112,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         return "Logout successful with " + user.getUsername();
     }
 
-    @Override
+    @Override   // Chưa làm
     public ResendOtpResponse resendOtp(ActiveAccountRequest request) {
 
         // Check user còn tồn tại không
@@ -254,9 +273,14 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
     // Build scope for claim - scope in body of token
     private String buildScope(UserEntity userEntity) {
-        return userEntity.getRoles().stream()
-                .map(role -> role.getRoleName().name()) // Convert enum thành string
-                .collect(Collectors.joining(","));
+        StringJoiner stringJoiner = new StringJoiner(" ");
+
+        if (!CollectionUtils.isEmpty(userEntity.getRoles()))
+            userEntity.getRoles().forEach(role -> {
+                stringJoiner.add("ROLE_" + role.getRoleName().name());
+            });
+
+        return stringJoiner.toString();
     }
 
     //

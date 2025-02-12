@@ -1,6 +1,6 @@
 package com.nettruyen.comic.service;
 
-import com.nettruyen.comic.dto.request.UserCreationRequest;
+import com.nettruyen.comic.dto.request.authentication.UserCreationRequest;
 import com.nettruyen.comic.dto.response.UserResponse;
 
 import java.util.List;

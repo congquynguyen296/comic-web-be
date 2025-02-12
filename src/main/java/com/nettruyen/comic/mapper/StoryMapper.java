@@ -1,7 +1,7 @@
 package com.nettruyen.comic.mapper;
 
-import com.nettruyen.comic.dto.request.StoryAddedRequest;
-import com.nettruyen.comic.dto.request.StoryUpdateRequest;
+import com.nettruyen.comic.dto.request.story.StoryAddedRequest;
+import com.nettruyen.comic.dto.request.story.StoryUpdateRequest;
 import com.nettruyen.comic.dto.response.StoryResponse;
 import com.nettruyen.comic.entity.StoryEntity;
 import org.mapstruct.Mapper;

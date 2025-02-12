@@ -1,4 +1,4 @@
-package com.nettruyen.comic.dto.request;
+package com.nettruyen.comic.dto.request.story;
 
 import com.nettruyen.comic.constant.StatusEnum;
 import lombok.*;
@@ -12,7 +12,10 @@ import java.util.Set;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class StoryAddedRequest {
+public class StoryUpdateRequest {
+
+    String id;
+
     String title;
 
     String author;
@@ -24,4 +27,5 @@ public class StoryAddedRequest {
     String coverImage;
 
     Set<String> generates = new HashSet<>();
+
 }

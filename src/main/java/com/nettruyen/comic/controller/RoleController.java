@@ -2,7 +2,7 @@ package com.nettruyen.comic.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.nettruyen.comic.constant.RoleEnum;
-import com.nettruyen.comic.dto.request.RoleCreationRequest;
+import com.nettruyen.comic.dto.request.authentication.RoleCreationRequest;
 import com.nettruyen.comic.dto.response.ApiResponse;
 import com.nettruyen.comic.service.IRoleService;
 import lombok.AccessLevel;

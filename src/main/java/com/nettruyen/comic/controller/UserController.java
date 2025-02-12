@@ -1,7 +1,7 @@
 package com.nettruyen.comic.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.nettruyen.comic.dto.request.UserCreationRequest;
+import com.nettruyen.comic.dto.request.authentication.UserCreationRequest;
 import com.nettruyen.comic.dto.response.ApiResponse;
 import com.nettruyen.comic.dto.response.UserResponse;
 import com.nettruyen.comic.service.IUserService;

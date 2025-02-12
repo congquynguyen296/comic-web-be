@@ -48,7 +48,7 @@ public class UserEntity extends AbstractEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     Set<NotificationEntity> notifications = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),

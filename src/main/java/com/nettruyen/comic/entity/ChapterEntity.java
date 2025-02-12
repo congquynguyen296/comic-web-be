@@ -21,7 +21,7 @@ public class ChapterEntity extends AbstractEntity {
     String title;
 
     @Lob    // Text trong db
-    @Column(name = "content")
+    @Column(name = "content", columnDefinition = "TEXT")
     String content;
 
     @Column(name = "chapter_number")

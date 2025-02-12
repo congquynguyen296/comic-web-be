@@ -1,4 +1,4 @@
-package com.nettruyen.comic.dto.request;
+package com.nettruyen.comic.dto.request.generate;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

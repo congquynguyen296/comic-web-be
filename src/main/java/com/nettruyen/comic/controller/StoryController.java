@@ -1,8 +1,8 @@
 package com.nettruyen.comic.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.nettruyen.comic.dto.request.StoryAddedRequest;
-import com.nettruyen.comic.dto.request.StoryUpdateRequest;
+import com.nettruyen.comic.dto.request.story.StoryAddedRequest;
+import com.nettruyen.comic.dto.request.story.StoryUpdateRequest;
 import com.nettruyen.comic.dto.response.ApiResponse;
 import com.nettruyen.comic.dto.response.StoryResponse;
 import com.nettruyen.comic.service.IStoryService;

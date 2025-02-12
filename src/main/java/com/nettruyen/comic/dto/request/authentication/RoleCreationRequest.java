@@ -1,5 +1,6 @@
-package com.nettruyen.comic.dto.request;
+package com.nettruyen.comic.dto.request.authentication;
 
+import com.nettruyen.comic.constant.RoleEnum;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -8,11 +9,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class GenerateUpdateRequest {
-
-    String id;
-
-    String name;
-
-    String description;
+public class RoleCreationRequest {
+    RoleEnum roleName;
 }

@@ -1,5 +1,4 @@
-package com.nettruyen.comic.dto.request;
-
+package com.nettruyen.comic.dto.request.generate;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -9,7 +8,11 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class LoginRequest {
-    String username;
-    String password;
+public class GenerateUpdateRequest {
+
+    String id;
+
+    String name;
+
+    String description;
 }

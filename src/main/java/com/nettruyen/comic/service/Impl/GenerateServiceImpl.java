@@ -1,7 +1,7 @@
 package com.nettruyen.comic.service.Impl;
 
-import com.nettruyen.comic.dto.request.GenerateAddedRequest;
-import com.nettruyen.comic.dto.request.GenerateUpdateRequest;
+import com.nettruyen.comic.dto.request.generate.GenerateAddedRequest;
+import com.nettruyen.comic.dto.request.generate.GenerateUpdateRequest;
 import com.nettruyen.comic.dto.response.GenerateResponse;
 import com.nettruyen.comic.entity.GenerateEntity;
 import com.nettruyen.comic.entity.StoryEntity;
@@ -18,7 +18,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.text.Normalizer;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

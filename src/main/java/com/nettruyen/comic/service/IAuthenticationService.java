@@ -1,9 +1,8 @@
 package com.nettruyen.comic.service;
 
-import com.nettruyen.comic.dto.request.ActiveAccountRequest;
-import com.nettruyen.comic.dto.request.LoginRequest;
-import com.nettruyen.comic.dto.request.RegisterRequest;
-import com.nettruyen.comic.dto.request.UserCreationRequest;
+import com.nettruyen.comic.dto.request.authentication.ActiveAccountRequest;
+import com.nettruyen.comic.dto.request.authentication.LoginRequest;
+import com.nettruyen.comic.dto.request.authentication.RegisterRequest;
 import com.nettruyen.comic.dto.response.AuthenticationResponse;
 import com.nettruyen.comic.dto.response.ResendOtpResponse;
 import com.nettruyen.comic.dto.response.UserResponse;

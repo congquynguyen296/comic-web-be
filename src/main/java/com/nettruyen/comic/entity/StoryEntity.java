@@ -27,7 +27,8 @@ public class StoryEntity extends AbstractEntity {
     @Column(name = "code")
     String code;
 
-    @Column(name = "description")
+    @Lob
+    @Column(name = "description", columnDefinition = "TEXT")
     String description;
 
     @Enumerated(EnumType.STRING)
