@@ -2,11 +2,13 @@ package com.nettruyen.comic.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.nettruyen.comic.dto.request.authentication.ActiveAccountRequest;
+import com.nettruyen.comic.dto.request.authentication.IntrospectRequest;
 import com.nettruyen.comic.dto.request.authentication.LoginRequest;
 import com.nettruyen.comic.dto.request.authentication.RegisterRequest;
 import com.nettruyen.comic.dto.response.ApiResponse;
-import com.nettruyen.comic.dto.response.AuthenticationResponse;
-import com.nettruyen.comic.dto.response.ResendOtpResponse;
+import com.nettruyen.comic.dto.response.authentication.AuthenticationResponse;
+import com.nettruyen.comic.dto.response.authentication.IntrospectResponse;
+import com.nettruyen.comic.dto.response.authentication.ResendOtpResponse;
 import com.nettruyen.comic.dto.response.UserResponse;
 import com.nettruyen.comic.service.IAuthenticationService;
 import jakarta.validation.Valid;
@@ -57,6 +59,14 @@ public class AuthenticationController {
         return ApiResponse.<AuthenticationResponse>builder()
                 .code(200)
                 .result(authenticationService.login(request))
+                .build();
+    }
+
+    @PostMapping("/introspect")
+    ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request) {
+        return ApiResponse.<IntrospectResponse>builder()
+                .code(200)
+                .result(authenticationService.introspect(request))
                 .build();
     }
 

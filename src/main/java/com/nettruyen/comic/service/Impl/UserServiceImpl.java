@@ -71,17 +71,68 @@ public class UserServiceImpl implements IUserService {
     @Override
     public void deleteUser(String username) {
 
+        if (username.isEmpty() || username == null)
+            throw new AppException(ErrorCode.UNCATEGORIZED);
+
+        try {
+            var userExisted = userRepository.findByUsername(username);
+            if (userExisted == null) {
+                throw new AppException(ErrorCode.USER_NOT_EXISTED);
+            } else {
+                userExisted.setIsActive(0);
+                userRepository.save(userExisted);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public UserResponse findUserByUsername(String username) {
-        return null;
+
+        if (username.isEmpty() || username == null)
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+
+        try {
+            UserEntity user = userRepository.findByUsername(username);
+
+            UserResponse userResponse = userMapper.toUserResponse(user);
+            userResponse.setRoles(user.getRoles().stream()
+                    .map(RoleEntity::getRoleName)
+                    .collect(Collectors.toSet()));
+
+            return userResponse;
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public List<UserResponse> findAllUsers() {
 
+        try {
+            List<UserEntity> users = userRepository.findAll();
 
+            if (!users.isEmpty()) {
+                return users.stream().map(user -> {
+                    UserResponse userResponse = userMapper.toUserResponse(user);
+
+                    userResponse.setRoles(user.getRoles().stream()
+                            .map(RoleEntity::getRoleName)
+                            .collect(Collectors.toSet()));
+
+                    return userResponse;
+                }).collect(Collectors.toList());
+
+            } else {
+                log.error("User list is empty");
+            }
+
+        } catch (AppException e) {
+            log.error(e.getMessage());
+        }
 
         return List.of();
     }

@@ -2,10 +2,12 @@ package com.nettruyen.comic.service.Impl;
 
 import com.nettruyen.comic.constant.RoleEnum;
 import com.nettruyen.comic.dto.request.authentication.ActiveAccountRequest;
+import com.nettruyen.comic.dto.request.authentication.IntrospectRequest;
 import com.nettruyen.comic.dto.request.authentication.LoginRequest;
 import com.nettruyen.comic.dto.request.authentication.RegisterRequest;
-import com.nettruyen.comic.dto.response.AuthenticationResponse;
-import com.nettruyen.comic.dto.response.ResendOtpResponse;
+import com.nettruyen.comic.dto.response.authentication.AuthenticationResponse;
+import com.nettruyen.comic.dto.response.authentication.IntrospectResponse;
+import com.nettruyen.comic.dto.response.authentication.ResendOtpResponse;
 import com.nettruyen.comic.dto.response.UserResponse;
 import com.nettruyen.comic.entity.RoleEntity;
 import com.nettruyen.comic.entity.UserEntity;
@@ -19,7 +21,9 @@ import com.nettruyen.comic.service.IAccountService;
 import com.nettruyen.comic.util.OtpGenerator;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -34,6 +38,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -54,6 +59,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
 
     static final long VALID_DURATION = 3600;    // Thgian hợp lệ của 1 token
+    static final long REFRESHABLE_DURATION = 3600;  // Thgian làm mới của 1 token
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -242,6 +248,21 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         }
     }
 
+    @Override
+    public IntrospectResponse introspect(IntrospectRequest request) {
+
+        var token = request.getToken();
+        boolean isValid = true;
+
+        try {
+            var signed = verifyToken(token, false);
+        } catch (AppException | JOSEException | ParseException e) {
+            isValid = false;
+        }
+
+        return IntrospectResponse.builder().valid(isValid).build();
+    }
+
 
     /* === Authentication for JWT === */
 
@@ -285,5 +306,27 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         return stringJoiner.toString();
     }
 
-    //
+    // Verify token
+    private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
+        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+
+        SignedJWT signedJWT = SignedJWT.parse(token);
+
+        Date expiryTime = (isRefresh)
+                ? new Date(signedJWT
+                .getJWTClaimsSet()
+                .getIssueTime()
+                .toInstant()
+                .plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS)
+                .toEpochMilli())
+                : signedJWT.getJWTClaimsSet().getExpirationTime();
+
+        var verified = signedJWT.verify(verifier);
+
+        if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.INVALID_EXPIRED_TOKEN);
+
+        // Thực hiện logic lưu token tại đây
+
+        return signedJWT;
+    }
 }
