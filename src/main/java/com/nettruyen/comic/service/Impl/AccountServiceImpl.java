@@ -36,10 +36,11 @@ public class AccountServiceImpl implements IAccountService {
 
     @Override
     public boolean validateOtp(String email, String otp) {
-        String redisKey = getRedisKey(email);
-        String storedOtp = (String) redisTemplate.opsForValue().get(redisKey);
+        String redisKey = getRedisKeyForConfirmEmail(email);
+        String storedOtp = redisService.getObject(redisKey, String.class);
+
         if (storedOtp != null && storedOtp.equals(otp)) {
-            redisTemplate.delete(redisKey); // Xóa OTP khi hợp lệ
+            redisService.deleteObject(redisKey);
             return true;
         }
         return false;
@@ -47,10 +48,10 @@ public class AccountServiceImpl implements IAccountService {
 
     @Override
     public void saveOtp(String email, String otp) {
-        redisTemplate.opsForValue().set(getRedisKey(email), otp, Duration.ofMinutes(10));
+        redisService.setObject(getRedisKeyForConfirmEmail(email), otp, 300);
     }
 
-    private String getRedisKey(String email) {
-        return "OTP_" + email;
+    private String getRedisKeyForConfirmEmail(String email) {
+        return "auth:email:otp:" + email;
     }
 }

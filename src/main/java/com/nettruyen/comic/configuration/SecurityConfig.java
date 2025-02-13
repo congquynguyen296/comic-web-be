@@ -18,12 +18,12 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINT = {
-            "/auth/**",
-            "/users/**",
-            "/story/**",
-            "/generate/**",
-            "/stories/**",
-            "/role/**"
+            "/api/auth/**",
+            "/api/users/**",
+            "/api/story/**",
+            "/api/generate/**",
+            "/api/stories/**",
+            "/api/role/**"
     };
 
 
@@ -37,7 +37,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINT).permitAll()
                         .requestMatchers(HttpMethod.PUT, PUBLIC_ENDPOINT).permitAll()
-                        .requestMatchers("/admin/**").hasAuthority("SCOPE_ADMIN")
+                        .requestMatchers("/api/admin/**").hasAuthority("SCOPE_ADMIN")
                         .anyRequest().authenticated()
                 );
                 // .exceptionHandling(ex -> ex.accessDeniedHandler(customAccessDeniedHandler));

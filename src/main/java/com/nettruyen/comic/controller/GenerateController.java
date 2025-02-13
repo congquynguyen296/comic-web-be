@@ -18,7 +18,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/generate")
+@RequestMapping("/api/generate")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)

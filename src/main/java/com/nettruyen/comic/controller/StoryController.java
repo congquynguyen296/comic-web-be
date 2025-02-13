@@ -29,7 +29,7 @@ public class StoryController {
 
     IStoryService storyService;
 
-    @PostMapping("/story")
+    @PostMapping("/api/story")
     ApiResponse<StoryResponse> createStory(@RequestBody @Valid StoryAddedRequest storyAddedRequest) {
         return ApiResponse.<StoryResponse>builder()
                 .code(200)
@@ -37,7 +37,7 @@ public class StoryController {
                 .build();
     }
 
-    @PutMapping("/story")
+    @PutMapping("/api/story")
     ApiResponse<StoryResponse> updateStory(@RequestBody @Valid StoryUpdateRequest storyUpdateRequest) {
         return ApiResponse.<StoryResponse>builder()
                 .code(200)
@@ -45,7 +45,7 @@ public class StoryController {
                 .build();
     }
 
-    @DeleteMapping("/story")
+    @DeleteMapping("/api/story")
     ApiResponse<Void> deleteStory(@RequestParam String code) {
         storyService.deleteStory(code);
         return ApiResponse.<Void>builder()
@@ -54,7 +54,7 @@ public class StoryController {
                 .build();
     }
 
-    @GetMapping("/stories")
+    @GetMapping("/api/stories")
     public ApiResponse<Map<String, Object>> getAllStory(
             @RequestParam(required = false) Integer pageNo,
             @RequestParam(required = false) Integer pageSize) {

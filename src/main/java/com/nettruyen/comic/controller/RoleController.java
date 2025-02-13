@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/role")
+@RequestMapping("/api/role")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)

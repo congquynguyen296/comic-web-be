@@ -17,7 +17,7 @@ import java.io.IOException;
 
 @Slf4j
 @RestController
-@RequestMapping("/cloudinary")
+@RequestMapping("/api/cloudinary")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -12,7 +12,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -46,10 +45,15 @@ public class RedisServiceImpl implements IRedisService {
 
         try {
             String json = objectMapper.writeValueAsString(value);
-            redisTemplate.opsForValue().set(key, json, timeout);
+            redisTemplate.opsForValue().set(key, json, Duration.ofSeconds(timeout));
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to serialize object to JSON", e);
         }
+    }
+
+    @Override
+    public void deleteObject(String key) {
+        redisTemplate.delete(key);
     }
 
 }
