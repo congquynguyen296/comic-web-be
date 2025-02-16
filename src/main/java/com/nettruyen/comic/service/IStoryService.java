@@ -2,7 +2,7 @@ package com.nettruyen.comic.service;
 
 import com.nettruyen.comic.dto.request.story.StoryAddedRequest;
 import com.nettruyen.comic.dto.request.story.StoryUpdateRequest;
-import com.nettruyen.comic.dto.response.StoryResponse;
+import com.nettruyen.comic.dto.response.story.StoryResponse;
 import org.springframework.data.domain.Page;
 
 import java.util.List;

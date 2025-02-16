@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.nettruyen.comic.dto.request.story.StoryAddedRequest;
 import com.nettruyen.comic.dto.request.story.StoryUpdateRequest;
 import com.nettruyen.comic.dto.response.ApiResponse;
-import com.nettruyen.comic.dto.response.StoryResponse;
+import com.nettruyen.comic.dto.response.story.StoryResponse;
 import com.nettruyen.comic.service.IStoryService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;

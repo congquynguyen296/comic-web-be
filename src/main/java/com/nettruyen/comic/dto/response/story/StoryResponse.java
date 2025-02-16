@@ -1,4 +1,4 @@
-package com.nettruyen.comic.dto.response;
+package com.nettruyen.comic.dto.response.story;
 
 import com.nettruyen.comic.constant.StatusEnum;
 import lombok.*;

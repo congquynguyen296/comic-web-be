@@ -2,7 +2,7 @@ package com.nettruyen.comic.mapper;
 
 import com.nettruyen.comic.dto.request.generate.GenerateAddedRequest;
 import com.nettruyen.comic.dto.request.generate.GenerateUpdateRequest;
-import com.nettruyen.comic.dto.response.GenerateResponse;
+import com.nettruyen.comic.dto.response.story.GenerateResponse;
 import com.nettruyen.comic.entity.GenerateEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

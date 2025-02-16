@@ -2,7 +2,7 @@ package com.nettruyen.comic.service.Impl;
 
 import com.nettruyen.comic.dto.request.generate.GenerateAddedRequest;
 import com.nettruyen.comic.dto.request.generate.GenerateUpdateRequest;
-import com.nettruyen.comic.dto.response.GenerateResponse;
+import com.nettruyen.comic.dto.response.story.GenerateResponse;
 import com.nettruyen.comic.entity.GenerateEntity;
 import com.nettruyen.comic.entity.StoryEntity;
 import com.nettruyen.comic.exception.AppException;

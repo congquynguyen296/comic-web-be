@@ -3,7 +3,7 @@ package com.nettruyen.comic.service.Impl;
 import com.nettruyen.comic.constant.StatusEnum;
 import com.nettruyen.comic.dto.request.story.StoryAddedRequest;
 import com.nettruyen.comic.dto.request.story.StoryUpdateRequest;
-import com.nettruyen.comic.dto.response.StoryResponse;
+import com.nettruyen.comic.dto.response.story.StoryResponse;
 import com.nettruyen.comic.entity.GenerateEntity;
 import com.nettruyen.comic.entity.StoryEntity;
 import com.nettruyen.comic.exception.AppException;
