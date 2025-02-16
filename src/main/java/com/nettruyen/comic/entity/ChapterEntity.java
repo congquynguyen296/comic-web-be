@@ -1,6 +1,5 @@
 package com.nettruyen.comic.entity;
 
-import com.nettruyen.comic.constant.StatusEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
