@@ -220,19 +220,10 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
             // Tạo otp + token và lưu vào redis
             String otpCode = OtpGenerator.generateOtp();
-            String token = UUID.randomUUID().toString();
             accountService.saveOtp(newUser.getEmail(), otpCode);
 
-            // Send otp qua email
-            String subject = "🔑 Activate Your Account at Q.comic!";
-            String body = "Hello " + newUser.getUsername() + ",\n\n"
-                    + "Thank you for signing up at Q.comic. To activate your account, please use the following OTP code:\n\n"
-                    + "🔒 Your OTP Code: " + otpCode + "\n\n"
-                    + "This code is valid for the next 10 minutes. Please do not share this code with anyone.\n\n"
-                    + "If you did not request this, please ignore this email.\n\n"
-                    + "Best regards,\n"
-                    + "The Q.comic Team";
-            accountService.sendEmail(newUser.getEmail(), subject, body);
+            // Send otp qua email ASYNC
+            accountService.sendEmailAsync(newUser.getEmail(), newUser.getUsername(), otpCode);
 
             UserResponse result = userMapper.toUserResponse(newUser);
 

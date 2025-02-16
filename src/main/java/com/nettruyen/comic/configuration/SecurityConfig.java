@@ -31,7 +31,9 @@ public class SecurityConfig {
             "/api/story/**",
             "/api/generate/**",
             "/api/stories/**",
-            "/api/role/**"
+            "/api/role/**",
+
+            "/api/admin/**",
     };
 
     // CustomJwtDecoder jwtDecoder;
@@ -48,7 +50,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINT).permitAll()
                         .requestMatchers(HttpMethod.PUT, PUBLIC_ENDPOINT).permitAll()
-                        .requestMatchers("/api/admin/**").hasAuthority("SCOPE_ADMIN")
+                        // .requestMatchers("/api/admin/**").hasAuthority("SCOPE_ADMIN")
                         .anyRequest().authenticated()
                 );
                 // .exceptionHandling(ex -> ex.accessDeniedHandler(customAccessDeniedHandler));

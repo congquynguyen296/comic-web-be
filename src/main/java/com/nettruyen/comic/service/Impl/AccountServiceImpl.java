@@ -6,12 +6,11 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 
 @Slf4j
 @Service
@@ -20,7 +19,6 @@ import java.time.Duration;
 public class AccountServiceImpl implements IAccountService {
 
     JavaMailSender mailSender;
-    RedisTemplate<String, Object> redisTemplate;
 
     IRedisService redisService;
 
@@ -31,7 +29,6 @@ public class AccountServiceImpl implements IAccountService {
         message.setSubject(subject);
         message.setText(body);
         mailSender.send(message);
-        log.info("Email send.");
     }
 
     @Override
@@ -53,5 +50,29 @@ public class AccountServiceImpl implements IAccountService {
 
     private String getRedisKeyForConfirmEmail(String email) {
         return "auth:email:otp:" + email;
+    }
+
+    // ===== Async Email =====
+
+    @Override
+    @Async("taskExecutor")
+    public void sendEmailAsync(String toEmail, String username, String otpCode) {
+        try {
+            String subject = "🔑 Activate Your Account at Q.comic!";
+            String body = "Hello " + username + ",\n\n"
+                    + "Thank you for signing up at Q.comic. To activate your account, please use the following OTP code:\n\n"
+                    + "🔒 Your OTP Code: " + otpCode + "\n\n"
+                    + "This code is valid for the next 10 minutes. Please do not share this code with anyone.\n\n"
+                    + "If you did not request this, please ignore this email.\n\n"
+                    + "Best regards,\n"
+                    + "The Q.comic Team";
+
+            // Thực chất email sẽ được gửi ở đây
+            sendEmail(toEmail, subject, body);
+            log.info("Email sent to {}", toEmail);
+
+        } catch (Exception e) {
+            log.error("Failed to send email to {}: {}", toEmail, e.getMessage());
+        }
     }
 }

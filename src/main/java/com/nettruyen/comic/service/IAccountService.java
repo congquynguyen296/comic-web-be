@@ -8,4 +8,6 @@ public interface IAccountService {
 
     void saveOtp(String email, String otp);
 
+    void sendEmailAsync(String toEmail, String username, String otpCode);
+
 }
