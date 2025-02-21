@@ -13,6 +13,8 @@ public interface IStoryService {
 
     StoryResponse getStoryById(String storyId);
 
+    StoryResponse getStoryByCode(String code);
+
     StoryResponse updateStory(StoryUpdateRequest storyUpdateRequest);
 
     void deleteStory(String storyId);

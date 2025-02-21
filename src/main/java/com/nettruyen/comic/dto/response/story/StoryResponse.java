@@ -1,6 +1,7 @@
 package com.nettruyen.comic.dto.response.story;
 
 import com.nettruyen.comic.constant.StatusEnum;
+import com.nettruyen.comic.dto.response.chapter.ChapterComponentResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -34,4 +35,6 @@ public class StoryResponse {
     Date updatedAt;
 
     Set<String> generates = new HashSet<>();
+
+    Set<ChapterComponentResponse> chapters = new HashSet<>();
 }

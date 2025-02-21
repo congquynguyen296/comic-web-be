@@ -1,25 +1,23 @@
-package com.nettruyen.comic.dto.request.chapter;
-
+package com.nettruyen.comic.dto.response.chapter;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class ChapterCreationRequest {
+public class ChapterComponentResponse {
 
-    String url;
+    String code;
 
     String title;
 
-    String content;
+    String date;
 
     String chapterNumber;
-
-    String code;
 
     String storyId;
 }

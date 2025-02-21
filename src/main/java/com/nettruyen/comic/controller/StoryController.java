@@ -54,6 +54,15 @@ public class StoryController {
                 .build();
     }
 
+    @GetMapping("/api/story/{code}")
+    ApiResponse<StoryResponse> getStory(@PathVariable String code) {
+
+        return ApiResponse.<StoryResponse>builder()
+                .code(200)
+                .result(storyService.getStoryByCode(code))
+                .build();
+    }
+
     @GetMapping("/api/stories")
     public ApiResponse<Map<String, Object>> getAllStory(
             @RequestParam(required = false) Integer pageNo,

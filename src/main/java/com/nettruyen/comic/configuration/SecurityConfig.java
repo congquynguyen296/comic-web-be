@@ -27,11 +27,13 @@ public class SecurityConfig {
 
     String[] PUBLIC_ENDPOINT = {
             "/api/auth/**",
+            "/api/generate/**",
             // "/api/users/**",
             "/api/story/**",
-            "/api/generate/**",
             "/api/stories/**",
             "/api/role/**",
+            "/api/chapters/**",
+            "/api/chapter/**",
 
             "/api/admin/**",
     };

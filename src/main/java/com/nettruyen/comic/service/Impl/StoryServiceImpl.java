@@ -85,6 +85,37 @@ public class StoryServiceImpl implements IStoryService {
             result.setGenerates(existedStory.getGenerates().stream()
                     .map(GenerateEntity::getName)
                     .collect(Collectors.toSet()));
+
+            result.setChapters(existedStory.getChapters().stream()
+                    .map(chapterEntity -> ConvertorUtil.convertToChapterComponentResponse(chapterEntity))
+                    .collect(Collectors.toSet()));
+            return result;
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new AppException(ErrorCode.UNCATEGORIZED);
+        }
+    }
+
+    @Override
+    public StoryResponse getStoryByCode(String code) {
+        if (code == null)
+            throw new AppException(ErrorCode.UNCATEGORIZED);
+
+        try {
+
+            StoryEntity existedStory = storyRepository.findByCode(code);
+
+            if (existedStory == null)
+                throw new AppException(ErrorCode.STORY_NOT_EXITS);
+            StoryResponse result = storyMapper.toResponse(existedStory);
+            result.setGenerates(existedStory.getGenerates().stream()
+                    .map(GenerateEntity::getName)
+                    .collect(Collectors.toSet()));
+
+            result.setChapters(existedStory.getChapters().stream()
+                    .map(chapterEntity -> ConvertorUtil.convertToChapterComponentResponse(chapterEntity))
+                    .collect(Collectors.toSet()));
             return result;
 
         } catch (Exception e) {
@@ -114,6 +145,10 @@ public class StoryServiceImpl implements IStoryService {
                 StoryResponse result = storyMapper.toResponse(storyExisted);
                 result.setGenerates(storyExisted.getGenerates().stream()
                         .map(GenerateEntity::getName)
+                        .collect(Collectors.toSet()));
+
+                result.setChapters(storyExisted.getChapters().stream()
+                        .map(chapterEntity -> ConvertorUtil.convertToChapterComponentResponse(chapterEntity))
                         .collect(Collectors.toSet()));
 
                 return result;
@@ -161,6 +196,11 @@ public class StoryServiceImpl implements IStoryService {
                             .map(GenerateEntity::getName)
                             .collect(Collectors.toSet()));
 
+                    // Map chapter (Get number only)
+                    storyResponse.setChapters(story.getChapters().stream()
+                            .map(chapterEntity -> ConvertorUtil.convertToChapterComponentResponse(chapterEntity))
+                            .collect(Collectors.toSet()));
+
                     return storyResponse;
 
                 }).toList();
@@ -183,22 +223,32 @@ public class StoryServiceImpl implements IStoryService {
 
         int adjustedPageNo = (pageNo > 0) ? pageNo - 1 : 0;
 
-        Pageable pageable = PageRequest.of(adjustedPageNo, pageSize);
-        Page<StoryEntity> stories = storyRepository.findAll(pageable);
+        try {
+            Pageable pageable = PageRequest.of(adjustedPageNo, pageSize);
+            Page<StoryEntity> stories = storyRepository.findAll(pageable);
 
-        return stories.map(story -> {
+            return stories.map(story -> {
 
-            StoryResponse storyResponse = storyMapper.toResponse(story);
+                StoryResponse storyResponse = storyMapper.toResponse(story);
 
-            // Set generate cho từng storyResponse
-            storyResponse.setGenerates(
-                    story.getGenerates().stream()
-                            .map(GenerateEntity::getName)
-                            .collect(Collectors.toSet())
-            );
+                // Set generate cho từng storyResponse
+                storyResponse.setGenerates(story.getGenerates().stream()
+                        .map(GenerateEntity::getName)
+                        .collect(Collectors.toSet()));
 
-            return storyResponse;
-        });
+                // Cân nhắc dùng hoặc không
+                // Có thể để khi vào chapter thì mới dùng
+                storyResponse.setChapters(story.getChapters().stream()
+                        .map(chapterEntity -> ConvertorUtil.convertToChapterComponentResponse(chapterEntity))
+                        .collect(Collectors.toSet()));
+
+                return storyResponse;
+            });
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new AppException(ErrorCode.UNCATEGORIZED);
+        }
+
 
         // Có thể tận dụng .parallelStream() để tăng tốc
     }

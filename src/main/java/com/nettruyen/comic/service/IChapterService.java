@@ -2,11 +2,11 @@ package com.nettruyen.comic.service;
 
 import com.nettruyen.comic.dto.request.chapter.ChapterCreationRequest;
 import com.nettruyen.comic.dto.request.chapter.ChapterUpdateRequest;
-import com.nettruyen.comic.dto.response.story.ChapterResponse;
+import com.nettruyen.comic.dto.response.chapter.ChapterResponse;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+
 
 public interface IChapterService {
 
@@ -14,9 +14,9 @@ public interface IChapterService {
 
     ChapterResponse updateChapter(ChapterUpdateRequest request);
 
-    ChapterResponse getChapterByChapterNumber(String chapterNumber);
+    Page<ChapterResponse> getAllChapters(int pageNo, int pageSize);
 
     List<ChapterResponse> getAllChapters();
 
-    Page<ChapterResponse> getAllChapters(Pageable pageable);
+    ChapterResponse getChapterByStoryCodeAndChapterCode(String storyCode, String chapterCode);
 }
