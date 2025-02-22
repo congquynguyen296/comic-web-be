@@ -18,5 +18,5 @@ public interface IChapterService {
 
     List<ChapterResponse> getAllChapters();
 
-    ChapterResponse getChapterByStoryCodeAndChapterCode(String storyCode, String chapterCode);
+    ChapterResponse getChapterByStoryCodeAndChapterNumber(String storyCode, Integer chapterNumber);
 }

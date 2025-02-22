@@ -17,9 +17,10 @@ public class ScraperData {
         return cleanedTitle;
     }
 
-    private static String getChapterNumber(Document doc) {
+    private static int getChapterNumber(Document doc) {
         Element title = doc.getElementsByClass("chap-title").first();
-        return title.select("span").first().text();
+        String fullText = title.select("span").first().text();
+        return Integer.parseInt(fullText.replaceAll("[^0-9]", ""));
     }
 
     public static ChapterCreationRequest scraperChapter(String url) {
@@ -30,7 +31,6 @@ public class ScraperData {
             ChapterCreationRequest chapter = ChapterCreationRequest.builder()
                     .title(getTitle(document))
                     .chapterNumber(getChapterNumber(document))
-                    .code(ConvertorUtil.convertNameToCode(getTitle(document)))
                     .content(conentElement.html())
                     .build();
 

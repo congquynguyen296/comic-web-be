@@ -17,9 +17,7 @@ public class ChapterCreationRequest {
 
     String content;
 
-    String chapterNumber;
-
-    String code;
+    Integer chapterNumber;
 
     String storyId;
 }

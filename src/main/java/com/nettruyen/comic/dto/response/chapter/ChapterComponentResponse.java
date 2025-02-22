@@ -11,13 +11,11 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class ChapterComponentResponse {
 
-    String code;
-
     String title;
 
     String date;
 
-    String chapterNumber;
+    Integer chapterNumber;
 
     String storyId;
 }

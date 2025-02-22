@@ -36,11 +36,11 @@ public class ChapterController {
 
     @GetMapping("/api/chapter")
     ApiResponse<ChapterResponse> getChapterByChapterNumber(@RequestParam("story-code") String storyCode,
-                                                           @RequestParam("chapter-code") String chapterCode) {
+                                                           @RequestParam("chapter-number") String chapterNumber) {
 
         return ApiResponse.<ChapterResponse>builder()
                 .code(200)
-                .result(chapterService.getChapterByStoryCodeAndChapterCode(storyCode, chapterCode))
+                .result(chapterService.getChapterByStoryCodeAndChapterNumber(storyCode, Integer.parseInt(chapterNumber)))
                 .build();
     }
 

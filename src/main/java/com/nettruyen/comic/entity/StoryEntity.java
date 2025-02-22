@@ -1,5 +1,6 @@
 package com.nettruyen.comic.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nettruyen.comic.constant.StatusEnum;
 import jakarta.persistence.*;
 import lombok.*;
@@ -38,7 +39,7 @@ public class StoryEntity extends AbstractEntity {
     @Column(name = "cover_image")
     String coverImage;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "story")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "story")
     Set<ChapterEntity> chapters = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "story")

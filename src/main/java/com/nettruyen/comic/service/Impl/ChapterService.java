@@ -12,7 +12,6 @@ import com.nettruyen.comic.mapper.StoryMapper;
 import com.nettruyen.comic.repository.IChapterRepository;
 import com.nettruyen.comic.repository.IStoryRepository;
 import com.nettruyen.comic.service.IChapterService;
-import com.nettruyen.comic.util.ConvertorUtil;
 import com.nettruyen.comic.util.ScraperData;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,14 +50,12 @@ public class ChapterService implements IChapterService {
             throw new AppException(ErrorCode.CHAPTER_NOT_EXITS);
 
         // Check xem chapter đã tồn tại chưa qua chapter code
-        if (chapterRepository.findByChapterCode(chapterScraped.getCode()) != null)
+        if (chapterRepository.findByChapterNumber(chapterScraped.getChapterNumber()) != null)
             throw new AppException(ErrorCode.CHAPTER_ALREADY_EXITS);
 
         try {
             ChapterEntity chapterEntity = chapterMapper.toEntity(chapterScraped);
-
             chapterEntity.setStory(storyEntityContainChapter.get());
-            chapterEntity.setChapterCode(ConvertorUtil.convertNameToCode(chapterEntity.getChapterNumber()));
 
 
             chapterRepository.save(chapterEntity);
@@ -112,15 +110,18 @@ public class ChapterService implements IChapterService {
     public Page<ChapterResponse> getAllChapters(int pageNo, int pageSize) {
         int adjustPageNo = (pageNo > 0) ? pageNo - 1 : 0;
 
-        Pageable pageable = PageRequest.of(adjustPageNo, pageSize);
-        Page<ChapterEntity> chapterEntities= chapterRepository.findAll(pageable);
+
+        Pageable pageable = PageRequest.of(adjustPageNo, pageSize,
+                Sort.by("chapterNumber").ascending());
+
+
 
         try {
-
+            Page<ChapterEntity> chapterEntities= chapterRepository.findAll(pageable);
             return chapterEntities.map(chapterEntity -> {
                 ChapterResponse chapterResponse = chapterMapper.toResponse(chapterEntity);
 
-                var storyContainChapter = storyRepository.findById(chapterEntity.getId());
+                var storyContainChapter = storyRepository.findById(chapterEntity.getStory().getId());
                 if (storyContainChapter.isPresent()) {
                     chapterResponse.setStory(storyMapper.toResponse(storyContainChapter.get()));
                 } else {
@@ -136,13 +137,13 @@ public class ChapterService implements IChapterService {
     }
 
     @Override
-    public ChapterResponse getChapterByStoryCodeAndChapterCode(String storyCode, String chapterCode) {
-        if (storyCode == null || chapterCode == null)
+    public ChapterResponse getChapterByStoryCodeAndChapterNumber(String storyCode, Integer chapterNumber) {
+        if (storyCode == null || chapterNumber == null)
             throw new AppException(ErrorCode.UNCATEGORIZED);
 
         try {
 
-            ChapterEntity chapterExisted = chapterRepository.findByStoryCodeAndChapterCode(storyCode, chapterCode);
+            ChapterEntity chapterExisted = chapterRepository.findByStoryCodeAndChapterNumber(storyCode, chapterNumber);
             if (chapterExisted == null) throw new AppException(ErrorCode.CHAPTER_NOT_EXITS);
 
             ChapterResponse result = chapterMapper.toResponse(chapterExisted);
@@ -159,5 +160,10 @@ public class ChapterService implements IChapterService {
             log.error(e.getMessage());
             throw new AppException(ErrorCode.UNCATEGORIZED);
         }
+    }
+
+    private int extractNumberFromChapterNumber(String chapterNumber) {
+        String numberPart = chapterNumber.replaceAll("[^0-9]", ""); // Loại bỏ tất cả ký tự không phải số
+        return Integer.parseInt(numberPart);
     }
 }

@@ -19,12 +19,9 @@ public class ChapterResponse {
 
     String title;
 
-    String chapterCode;
-
-
     String content;
 
-    String chapterNumber;
+    Integer chapterNumber;
 
     // Cân nhắc có cần lấy ra story hay không
     StoryResponse story;

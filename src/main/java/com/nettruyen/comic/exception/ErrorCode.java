@@ -28,7 +28,7 @@ public enum ErrorCode {
     STORY_NOT_EXITS(1112, "Story is not existed in your database.", HttpStatus.BAD_REQUEST),
 
     CHAPTER_ALREADY_EXITS(1113, "Chapter is existed in story of your database.", HttpStatus.BAD_REQUEST),
-    CHAPTER_NOT_EXITS(1114, "Story is not existed in story of your database.", HttpStatus.BAD_REQUEST),
+    CHAPTER_NOT_EXITS(1114, "Chapter is not existed in story of your database.", HttpStatus.BAD_REQUEST),
 
     GENERATE_ALREADY_EXITS(1121, "Generate is existed in your database.", HttpStatus.BAD_REQUEST),
     GENERATE_NOT_EXITS(1122, "Generate is not existed in your database.", HttpStatus.BAD_REQUEST),

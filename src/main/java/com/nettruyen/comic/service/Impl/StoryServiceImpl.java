@@ -4,11 +4,13 @@ import com.nettruyen.comic.constant.StatusEnum;
 import com.nettruyen.comic.dto.request.story.StoryAddedRequest;
 import com.nettruyen.comic.dto.request.story.StoryUpdateRequest;
 import com.nettruyen.comic.dto.response.story.StoryResponse;
+import com.nettruyen.comic.entity.ChapterEntity;
 import com.nettruyen.comic.entity.GenerateEntity;
 import com.nettruyen.comic.entity.StoryEntity;
 import com.nettruyen.comic.exception.AppException;
 import com.nettruyen.comic.exception.ErrorCode;
 import com.nettruyen.comic.mapper.StoryMapper;
+import com.nettruyen.comic.repository.IChapterRepository;
 import com.nettruyen.comic.repository.IGenerateRepository;
 import com.nettruyen.comic.repository.IStoryRepository;
 import com.nettruyen.comic.service.IStoryService;
@@ -20,8 +22,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +39,7 @@ public class StoryServiceImpl implements IStoryService {
 
     IGenerateRepository generateRepository;
     IStoryRepository storyRepository;
+    IChapterRepository chapterRepository;
     StoryMapper storyMapper;
 
 
@@ -87,8 +92,9 @@ public class StoryServiceImpl implements IStoryService {
                     .collect(Collectors.toSet()));
 
             result.setChapters(existedStory.getChapters().stream()
+                    .sorted(Comparator.comparingInt(ChapterEntity::getChapterNumber))
                     .map(chapterEntity -> ConvertorUtil.convertToChapterComponentResponse(chapterEntity))
-                    .collect(Collectors.toSet()));
+                    .toList());
             return result;
 
         } catch (Exception e) {
@@ -99,27 +105,36 @@ public class StoryServiceImpl implements IStoryService {
 
     @Override
     public StoryResponse getStoryByCode(String code) {
-        if (code == null)
+        if (code == null) {
             throw new AppException(ErrorCode.UNCATEGORIZED);
+        }
 
         try {
-
+            // Lấy thông tin truyện
             StoryEntity existedStory = storyRepository.findByCode(code);
-
-            if (existedStory == null)
+            if (existedStory == null) {
                 throw new AppException(ErrorCode.STORY_NOT_EXITS);
+            }
+
+            // Lấy danh sách chapter với phân trang và sắp xếp
+            Pageable pageable = PageRequest.of(0, 20, Sort.by("chapterNumber").ascending());
+            Page<ChapterEntity> chapterPage = chapterRepository.findByStoryCode(code, pageable);
+
+            // Chuyển đổi sang StoryResponse
             StoryResponse result = storyMapper.toResponse(existedStory);
             result.setGenerates(existedStory.getGenerates().stream()
                     .map(GenerateEntity::getName)
                     .collect(Collectors.toSet()));
 
-            result.setChapters(existedStory.getChapters().stream()
-                    .map(chapterEntity -> ConvertorUtil.convertToChapterComponentResponse(chapterEntity))
-                    .collect(Collectors.toSet()));
+            // Chuyển đổi và sắp xếp chapter (list sẽ giữ thứ tự)
+            result.setChapters(chapterPage.getContent().stream()
+                    .map(ConvertorUtil::convertToChapterComponentResponse)
+                    .collect(Collectors.toList()));
+
             return result;
 
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("Error fetching story by code: {}", e.getMessage());
             throw new AppException(ErrorCode.UNCATEGORIZED);
         }
     }
@@ -147,9 +162,9 @@ public class StoryServiceImpl implements IStoryService {
                         .map(GenerateEntity::getName)
                         .collect(Collectors.toSet()));
 
-                result.setChapters(storyExisted.getChapters().stream()
-                        .map(chapterEntity -> ConvertorUtil.convertToChapterComponentResponse(chapterEntity))
-                        .collect(Collectors.toSet()));
+//                result.setChapters(storyExisted.getChapters().stream()
+//                        .map(chapterEntity -> ConvertorUtil.convertToChapterComponentResponse(chapterEntity))
+//                        .collect(Collectors.toSet()));
 
                 return result;
             }
@@ -197,9 +212,9 @@ public class StoryServiceImpl implements IStoryService {
                             .collect(Collectors.toSet()));
 
                     // Map chapter (Get number only)
-                    storyResponse.setChapters(story.getChapters().stream()
-                            .map(chapterEntity -> ConvertorUtil.convertToChapterComponentResponse(chapterEntity))
-                            .collect(Collectors.toSet()));
+//                    storyResponse.setChapters(story.getChapters().stream()
+//                            .map(chapterEntity -> ConvertorUtil.convertToChapterComponentResponse(chapterEntity))
+//                            .collect(Collectors.toSet()));
 
                     return storyResponse;
 
@@ -240,7 +255,7 @@ public class StoryServiceImpl implements IStoryService {
                 // Có thể để khi vào chapter thì mới dùng
                 storyResponse.setChapters(story.getChapters().stream()
                         .map(chapterEntity -> ConvertorUtil.convertToChapterComponentResponse(chapterEntity))
-                        .collect(Collectors.toSet()));
+                        .toList());
 
                 return storyResponse;
             });

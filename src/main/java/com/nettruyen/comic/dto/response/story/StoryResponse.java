@@ -5,9 +5,7 @@ import com.nettruyen.comic.dto.response.chapter.ChapterComponentResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @NoArgsConstructor
@@ -36,5 +34,5 @@ public class StoryResponse {
 
     Set<String> generates = new HashSet<>();
 
-    Set<ChapterComponentResponse> chapters = new HashSet<>();
+    List<ChapterComponentResponse> chapters = new ArrayList<>();
 }
