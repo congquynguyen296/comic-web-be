@@ -10,5 +10,4 @@ public interface IStoryRepository extends JpaRepository<StoryEntity, String> {
     StoryEntity findByTitle(String title);
 
     StoryEntity findByCode(String code);
-
 }

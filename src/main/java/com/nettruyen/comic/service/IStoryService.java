@@ -13,7 +13,7 @@ public interface IStoryService {
 
     StoryResponse getStoryById(String storyId);
 
-    StoryResponse getStoryByCode(String code);
+    StoryResponse getStoryByCodeAndPagingChapter(String code, int pageNo, int pageSize);
 
     StoryResponse updateStory(StoryUpdateRequest storyUpdateRequest);
 
@@ -22,4 +22,6 @@ public interface IStoryService {
     List<StoryResponse> getAllStory();
 
     Page<StoryResponse> getAllStory(int pageNo, int pageSize);
+
+    int countChapterByStoryCode(String storyCode);
 }

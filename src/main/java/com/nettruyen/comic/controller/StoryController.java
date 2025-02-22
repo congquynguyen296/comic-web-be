@@ -55,16 +55,24 @@ public class StoryController {
     }
 
     @GetMapping("/api/story/{code}")
-    ApiResponse<StoryResponse> getStory(@PathVariable String code) {
+    ApiResponse<StoryResponse> getStory(@PathVariable String code,
+                                        @RequestParam("page-no") String pageNo,
+                                        @RequestParam("page-size") String pageSize) {
 
         return ApiResponse.<StoryResponse>builder()
                 .code(200)
-                .result(storyService.getStoryByCode(code))
+                .result(storyService.getStoryByCodeAndPagingChapter(
+                        code, Integer.parseInt(pageNo), Integer.parseInt(pageSize)))
                 .build();
     }
 
+    @GetMapping("api/story/{story-code}/total-chapters")
+    int getTotalChapters(@PathVariable("story-code") String parameter) {
+        return storyService.countChapterByStoryCode(parameter);
+    }
+
     @GetMapping("/api/stories")
-    public ApiResponse<Map<String, Object>> getAllStory(
+    ApiResponse<Map<String, Object>> getAllStory(
             @RequestParam(required = false) Integer pageNo,
             @RequestParam(required = false) Integer pageSize) {
 

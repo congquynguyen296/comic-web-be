@@ -104,7 +104,7 @@ public class StoryServiceImpl implements IStoryService {
     }
 
     @Override
-    public StoryResponse getStoryByCode(String code) {
+    public StoryResponse getStoryByCodeAndPagingChapter(String code, int pageNo, int pageSize) {
         if (code == null) {
             throw new AppException(ErrorCode.UNCATEGORIZED);
         }
@@ -117,7 +117,7 @@ public class StoryServiceImpl implements IStoryService {
             }
 
             // Lấy danh sách chapter với phân trang và sắp xếp
-            Pageable pageable = PageRequest.of(0, 20, Sort.by("chapterNumber").ascending());
+            Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("chapterNumber").ascending());
             Page<ChapterEntity> chapterPage = chapterRepository.findByStoryCode(code, pageable);
 
             // Chuyển đổi sang StoryResponse
@@ -266,5 +266,16 @@ public class StoryServiceImpl implements IStoryService {
 
 
         // Có thể tận dụng .parallelStream() để tăng tốc
+    }
+
+    @Override
+    public int countChapterByStoryCode(String storyCode) {
+        try {
+            StoryEntity storyExisted = storyRepository.findByCode(storyCode);
+            return storyExisted.getChapters().size();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return 0;
     }
 }

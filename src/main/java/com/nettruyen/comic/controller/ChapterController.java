@@ -5,6 +5,7 @@ import com.nettruyen.comic.dto.request.chapter.ChapterCreationRequest;
 import com.nettruyen.comic.dto.response.ApiResponse;
 import com.nettruyen.comic.dto.response.chapter.ChapterResponse;
 import com.nettruyen.comic.service.IChapterService;
+import com.nettruyen.comic.util.ConvertorUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -38,9 +39,15 @@ public class ChapterController {
     ApiResponse<ChapterResponse> getChapterByChapterNumber(@RequestParam("story-code") String storyCode,
                                                            @RequestParam("chapter-number") String chapterNumber) {
 
+        // Cắt đi chữ chuong trong BE.
+        int chapterNumberInt = chapterNumber.contains("-")
+                ? Integer.parseInt(chapterNumber.split("-")[1])
+                : Integer.parseInt(chapterNumber);
+
+
         return ApiResponse.<ChapterResponse>builder()
                 .code(200)
-                .result(chapterService.getChapterByStoryCodeAndChapterNumber(storyCode, Integer.parseInt(chapterNumber)))
+                .result(chapterService.getChapterByStoryCodeAndChapterNumber(storyCode, chapterNumberInt))
                 .build();
     }
 
