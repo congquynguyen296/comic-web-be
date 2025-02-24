@@ -24,3 +24,5 @@ spring:
 
 jwt:
   signerKey: ${SIGNER_KEY}
+  valid-duration: 20 # Thgian hiệu lực của token (in second)
+  refreshable-duration: 120 # Thgian có hiệu lực của refresh token

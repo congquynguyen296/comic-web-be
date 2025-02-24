@@ -4,6 +4,8 @@ import com.nettruyen.comic.dto.response.ApiResponse;
 import com.nettruyen.comic.validation.MinAge;
 import jakarta.validation.constraints.Size;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -47,6 +49,12 @@ public class GlobalExceptionHandler {
                         .message(errorCode.getMessage())
                         .build()
         );
+    }
+
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<?> handleJwtException(JwtException e) {
+        return new ResponseEntity<>(new AppException(ErrorCode.INVALID_EXPIRED_TOKEN),
+                ErrorCode.INVALID_EXPIRED_TOKEN.getHttpStatusCode());
     }
 
     // Đây là loại Exception khi sai yêu cầu về các field (Json)

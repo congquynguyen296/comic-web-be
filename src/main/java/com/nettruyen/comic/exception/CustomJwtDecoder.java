@@ -2,6 +2,7 @@ package com.nettruyen.comic.exception;
 
 import com.nettruyen.comic.dto.request.authentication.IntrospectRequest;
 import com.nettruyen.comic.service.IAuthenticationService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -15,6 +16,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.util.Objects;
 
 @Component
+@Slf4j
 public class CustomJwtDecoder implements JwtDecoder {
 
     // Đây là phương thức tự động decode token ngay khi vào filter của Security
@@ -30,11 +32,15 @@ public class CustomJwtDecoder implements JwtDecoder {
 
     @Override
     public Jwt decode(String token) throws JwtException {
+
+        // Check xem token còn hiệu lực hay không qua hàm introspect
         var response = authenticationService.introspect(
                 IntrospectRequest.builder().token(token).build());
+        log.error(ErrorCode.INVALID_EXPIRED_TOKEN.getMessage());
 
-        if (!response.isValid()) throw new JwtException("Token invalid");
+        if (!response.isValid()) throw new AppException(ErrorCode.INVALID_EXPIRED_TOKEN);
 
+        // Nếu chưa thì mới tiếp tục chuyển tới cho nimbus thực hiện chức năng của nó là decode token
         if (Objects.isNull(nimbusJwtDecoder)) {
             SecretKeySpec secretKeySpec = new SecretKeySpec(SIGNER_KEY.getBytes(), "HS512");
             nimbusJwtDecoder = NimbusJwtDecoder.withSecretKey(secretKeySpec)

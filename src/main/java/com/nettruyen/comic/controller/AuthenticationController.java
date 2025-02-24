@@ -1,22 +1,22 @@
 package com.nettruyen.comic.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.nettruyen.comic.dto.request.authentication.ActiveAccountRequest;
-import com.nettruyen.comic.dto.request.authentication.IntrospectRequest;
-import com.nettruyen.comic.dto.request.authentication.LoginRequest;
-import com.nettruyen.comic.dto.request.authentication.RegisterRequest;
+import com.nettruyen.comic.dto.request.authentication.*;
 import com.nettruyen.comic.dto.response.ApiResponse;
 import com.nettruyen.comic.dto.response.authentication.AuthenticationResponse;
 import com.nettruyen.comic.dto.response.authentication.IntrospectResponse;
 import com.nettruyen.comic.dto.response.authentication.ResendOtpResponse;
 import com.nettruyen.comic.dto.response.UserResponse;
 import com.nettruyen.comic.service.IAuthenticationService;
+import com.nimbusds.jose.JOSEException;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.text.ParseException;
 
 @Slf4j
 @RestController
@@ -71,10 +71,20 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    ApiResponse<String> logout(@RequestParam("username") String username) {
+    ApiResponse<String> logout(@RequestBody LogoutRequest token)
+            throws ParseException, JOSEException {
         return ApiResponse.<String>builder()
                 .code(200)
-                .result(authenticationService.logout(username))
+                .result(authenticationService.logout(token))
+                .build();
+    }
+
+    @PostMapping("/refresh-token")
+    ApiResponse<AuthenticationResponse> refreshToken(@RequestBody RefreshTokenRequest request)
+            throws ParseException, JOSEException {
+        return ApiResponse.<AuthenticationResponse>builder()
+                .code(200)
+                .result(authenticationService.refreshToken(request))
                 .build();
     }
 }

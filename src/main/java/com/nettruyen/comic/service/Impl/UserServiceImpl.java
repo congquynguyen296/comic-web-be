@@ -15,6 +15,10 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +31,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@EnableMethodSecurity
 public class UserServiceImpl implements IUserService {
 
     UserMapper userMapper;
@@ -34,6 +39,7 @@ public class UserServiceImpl implements IUserService {
     IRoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public UserResponse createUser(UserCreationRequest request) {
 
@@ -68,6 +74,7 @@ public class UserServiceImpl implements IUserService {
         return null;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void deleteUser(String username) {
 
@@ -109,6 +116,8 @@ public class UserServiceImpl implements IUserService {
         }
     }
 
+    // @PreAuthorize("hasAuthority('APPROVE_POST')")    // Áp dụng cho permission
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public List<UserResponse> findAllUsers() {
 
@@ -135,5 +144,56 @@ public class UserServiceImpl implements IUserService {
         }
 
         return List.of();
+    }
+
+    @Override
+    @PostAuthorize("returnObject.username == authentication.name")  // Chỉ lấy được thông tin của bản thân
+    public UserResponse findUserById(String id) {
+
+        if (id == null)
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+
+        try {
+            UserEntity userExisted = userRepository.findById(id)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+            UserResponse userResponse = userMapper.toUserResponse(userExisted);
+
+            // Map role
+            Set<RoleEnum> roles = userExisted.getRoles().stream()
+                    .map(RoleEntity::getRoleName)
+                    .collect(Collectors.toSet());
+            userResponse.setRoles(roles);
+            return userResponse;
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        }
+    }
+
+    // Khi đăng nhập ròi thì thông tin sẽ được giữ trong context
+    @Override
+    public UserResponse getMyInfo() {
+
+        var context = SecurityContextHolder.getContext();
+        String username = context.getAuthentication().getName();
+
+        try {
+            UserEntity user = userRepository.findByUsername(username);
+            if (user == null)
+                throw new AppException(ErrorCode.USER_NOT_EXISTED);
+
+            UserResponse userResponse = userMapper.toUserResponse(user);
+            Set<RoleEnum> roles = user.getRoles().stream()
+                    .map(RoleEntity::getRoleName)
+                    .collect(Collectors.toSet());
+            userResponse.setRoles(roles);
+
+            return userResponse;
+
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        }
     }
 }

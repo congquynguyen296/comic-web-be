@@ -19,7 +19,7 @@ public class CustomJwtAuthenticationEntryPoint implements AuthenticationEntryPoi
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException {
-        ErrorCode errorCode = ErrorCode.UNAUTHENTICATED;
+        ErrorCode errorCode = ErrorCode.INVALID_EXPIRED_TOKEN;
 
         response.setStatus(errorCode.getHttpStatusCode().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

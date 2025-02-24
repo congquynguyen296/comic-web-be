@@ -2,7 +2,6 @@ package com.nettruyen.comic.configuration;
 
 import com.nettruyen.comic.exception.CustomJwtAuthenticationEntryPoint;
 import com.nettruyen.comic.exception.CustomJwtDecoder;
-import jakarta.servlet.http.HttpSession;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -13,12 +12,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import javax.crypto.spec.SecretKeySpec;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 @Configuration
 @RequiredArgsConstructor
@@ -28,56 +28,51 @@ public class SecurityConfig {
     String[] PUBLIC_ENDPOINT = {
             "/api/auth/**",
             "/api/generate/**",
-            // "/api/users/**",
             "/api/story/**",
             "/api/stories/**",
-            "/api/role/**",
             "/api/chapters/**",
             "/api/chapter/**",
-
-            "/api/admin/**",
     };
-
-    // CustomJwtDecoder jwtDecoder;
 
     @NonFinal
     @Value("${jwt.signerKey}")
     String SIGNER_KEY;
 
+    CustomJwtDecoder jwtDecoder;
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, HttpSession httpSession) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINT).permitAll()
                         .requestMatchers(HttpMethod.PUT, PUBLIC_ENDPOINT).permitAll()
-                        // .requestMatchers("/api/admin/**").hasAuthority("SCOPE_ADMIN")
+                        // .requestMatchers("/api/admin/**").hasRole(RoleEnum.ADMIN.name())
                         .anyRequest().authenticated()
+                )
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.decoder(jwtDecoder))
+                        .authenticationEntryPoint(new CustomJwtAuthenticationEntryPoint())
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 );
-                // .exceptionHandling(ex -> ex.accessDeniedHandler(customAccessDeniedHandler));
-
-        // Cấu hình chấp nhận token ở header khi thực request đến
-        http.oauth2ResourceServer(oauth2 -> {
-            oauth2.jwt(jwtConfigurer -> {
-
-                // Config cho một IDP bên thứ 3: Nghĩa là giao cho bên này đảm nhiệm quá trình đăng nhập
-                // jwtConfigurer.jwkSetUri("https://security-outbound");
-
-                jwtConfigurer.decoder(jwtDecoder());
-
-            }).authenticationEntryPoint(new CustomJwtAuthenticationEntryPoint());
-        });
-
-        http.csrf(AbstractHttpConfigurer::disable);
-
 
         return http.build();
     }
 
     @Bean
-    JwtDecoder jwtDecoder() {
-        SecretKeySpec spec = new SecretKeySpec(SIGNER_KEY.getBytes(), "HS512");
-        return NimbusJwtDecoder.withSecretKey(spec).macAlgorithm(MacAlgorithm.HS512).build();
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            String scope = jwt.getClaimAsString("scope");
+            if (scope != null && !scope.trim().isEmpty()) {
+                String[] roles = scope.trim().split("\\s+");
+                return Arrays.stream(roles)
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
+            }
+            return Collections.emptyList();
+        });
+        return converter;
     }
 }

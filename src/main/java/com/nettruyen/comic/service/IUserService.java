@@ -16,4 +16,8 @@ public interface IUserService {
     UserResponse findUserByUsername(String username);
 
     List<UserResponse> findAllUsers();
+
+    UserResponse findUserById(String id);
+
+    UserResponse getMyInfo();
 }

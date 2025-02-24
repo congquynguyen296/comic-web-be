@@ -1,19 +1,18 @@
 package com.nettruyen.comic.service.Impl;
 
 import com.nettruyen.comic.constant.RoleEnum;
-import com.nettruyen.comic.dto.request.authentication.ActiveAccountRequest;
-import com.nettruyen.comic.dto.request.authentication.IntrospectRequest;
-import com.nettruyen.comic.dto.request.authentication.LoginRequest;
-import com.nettruyen.comic.dto.request.authentication.RegisterRequest;
+import com.nettruyen.comic.dto.request.authentication.*;
 import com.nettruyen.comic.dto.response.authentication.AuthenticationResponse;
 import com.nettruyen.comic.dto.response.authentication.IntrospectResponse;
 import com.nettruyen.comic.dto.response.authentication.ResendOtpResponse;
 import com.nettruyen.comic.dto.response.UserResponse;
+import com.nettruyen.comic.entity.InvalidatedToken;
 import com.nettruyen.comic.entity.RoleEntity;
 import com.nettruyen.comic.entity.UserEntity;
 import com.nettruyen.comic.exception.AppException;
 import com.nettruyen.comic.exception.ErrorCode;
 import com.nettruyen.comic.mapper.UserMapper;
+import com.nettruyen.comic.repository.IInvalidatedRepository;
 import com.nettruyen.comic.repository.IRoleRepository;
 import com.nettruyen.comic.repository.IUserRepository;
 import com.nettruyen.comic.service.IAuthenticationService;
@@ -52,14 +51,20 @@ import java.util.stream.Collectors;
 public class AuthenticationServiceImpl implements IAuthenticationService {
 
     UserMapper userMapper;
-    IUserRepository userRepository;
     PasswordEncoder passwordEncoder;
+    IUserRepository userRepository;
     IAccountService accountService;
     IRoleRepository roleRepository;
+    IInvalidatedRepository invalidatedRepository;
 
 
-    static final long VALID_DURATION = 3600;    // Thgian hợp lệ của 1 token
-    static final long REFRESHABLE_DURATION = 3600;  // Thgian làm mới của 1 token
+    @NonFinal
+    @Value("${jwt.valid-duration}")
+    long VALID_DURATION;
+
+    @NonFinal
+    @Value("${jwt.refreshable-duration}")
+    long REFRESHABLE_DURATION;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -87,7 +92,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
                 .collect(Collectors.toList());
         UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
+                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), authorities);
 
         // Gán cái vừa tạo cho SecurityContextHolder biết
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -107,16 +112,34 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     }
 
 
-    @Override   // Chưa làm
-    public String logout(String username) {
+    @Override
+    public String logout(LogoutRequest request) throws ParseException, JOSEException {
 
-        // Logic cho logout sẽ ở đây (token - khi mở rộng hệ thống)
+        // Khi logout thì cho dù token có hết hạn vẫn logout được => Đặt trong try catch
+        // để tránh verify token dừng chương trình
+        try {
 
-        UserEntity user = userRepository.findByUsername(username);
-        if (user == null)
-            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+            // Khi logout thì phải lưu luôn token xuống blacklist, do đó phải dùng cái
+            // thgian refresh. Nếu kh, khi token lưu xuống blacklist thì hacker vẫn
+            // có thể dùng refresh token (do còn hiệu lực) để lấy token mới
+            SignedJWT signedJWT = verifyToken(request.getToken(), true);
 
-        return "Logout successful with " + user.getUsername();
+            String jit = signedJWT.getJWTClaimsSet().getJWTID();
+            Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+            InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                    .id(jit)
+                    .expiryTime(expiryTime)
+                    .build();
+
+            // Khi logout sẽ thêm một col của token vào bảng invalidated token
+            return invalidatedRepository.save(invalidatedToken).getId();
+
+        } catch (Exception e) {
+            log.info("Token already expiry");
+        }
+
+        return "Logout successful";
     }
 
     @Override   // Chưa làm
@@ -254,6 +277,33 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
         return IntrospectResponse.builder().valid(isValid).build();
     }
 
+    @Override
+    public AuthenticationResponse refreshToken(RefreshTokenRequest request) throws ParseException, JOSEException {
+
+        SignedJWT signedJWT = verifyToken(request.getToken(), true);
+
+        var jit = signedJWT.getJWTClaimsSet().getJWTID();
+        var expiryDate = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                .id(jit)
+                .expiryTime(expiryDate)
+                .build();
+
+        invalidatedRepository.save(invalidatedToken);
+
+        // Lấy ra user để gán lại cái token mới
+        var user = userRepository.findByUsername(signedJWT.getJWTClaimsSet().getSubject());
+        if (user == null) throw new AppException(ErrorCode.USER_NOT_EXISTED);
+
+        var newToken = generateToken(user);
+        return AuthenticationResponse.builder()
+                .token(newToken)
+                .isActive(user.getIsActive())
+                .message(user.getUsername())
+                .build();
+    }
+
 
     /* === Authentication for JWT === */
 
@@ -270,7 +320,7 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 .issueTime(new Date())
                 .expirationTime(Date.from(Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS)))
                 .claim("scope", buildScope(userEntity))
-                .jwtID(UUID.randomUUID().toString())
+                .jwtID(UUID.randomUUID().toString())    // Token id
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(jwsHeader, payload);
@@ -316,7 +366,9 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
 
         if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.INVALID_EXPIRED_TOKEN);
 
-        // Thực hiện logic lưu token tại đây
+        // Thực hiện logic kiểm tra token tại đây
+        if (invalidatedRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
+            throw new AppException(ErrorCode.INVALID_EXPIRED_TOKEN);
 
         return signedJWT;
     }
