@@ -3,7 +3,7 @@ package com.nettruyen.comic.controller;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.nettruyen.comic.dto.request.authentication.UserCreationRequest;
 import com.nettruyen.comic.dto.response.ApiResponse;
-import com.nettruyen.comic.dto.response.UserResponse;
+import com.nettruyen.comic.dto.response.user.UserResponse;
 import com.nettruyen.comic.service.IUserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;

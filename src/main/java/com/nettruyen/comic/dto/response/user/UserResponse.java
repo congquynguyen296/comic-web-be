@@ -1,4 +1,4 @@
-package com.nettruyen.comic.dto.response;
+package com.nettruyen.comic.dto.response.user;
 
 import com.nettruyen.comic.constant.RoleEnum;
 import lombok.*;
@@ -21,5 +21,6 @@ public class UserResponse {
     String email;
     LocalDate dob;
     Integer isActive;
+    String picture;
     Set<RoleEnum> roles;
 }

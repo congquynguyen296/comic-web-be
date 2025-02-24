@@ -39,6 +39,9 @@ public class UserEntity extends AbstractEntity {
     @Column(name = "is_active")
     Integer isActive;
 
+    @Column(name = "picture")
+    String picture;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
     Set<FavoriteEntity> favorites = new HashSet<>();
 

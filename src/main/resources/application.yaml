@@ -22,7 +22,15 @@ spring:
       ddl-auto: update
     show-sql: true
 
+
+outbound:
+  identity:
+    client-id: ${CLIENT_ID}
+    client-secret: ${CLIENT_SECRET}
+    redirect-uri: "http://localhost:3000/authentication"
+
+
 jwt:
   signerKey: ${SIGNER_KEY}
-  valid-duration: 20 # Thgian hiệu lực của token (in second)
-  refreshable-duration: 120 # Thgian có hiệu lực của refresh token
+  valid-duration: 600 # Thgian hiệu lực của token (in second)
+  refreshable-duration: 3600 # Thgian có hiệu lực của refresh token

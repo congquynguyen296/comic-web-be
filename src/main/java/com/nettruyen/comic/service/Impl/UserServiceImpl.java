@@ -2,14 +2,14 @@ package com.nettruyen.comic.service.Impl;
 
 import com.nettruyen.comic.constant.RoleEnum;
 import com.nettruyen.comic.dto.request.authentication.UserCreationRequest;
-import com.nettruyen.comic.dto.response.UserResponse;
+import com.nettruyen.comic.dto.response.user.UserResponse;
 import com.nettruyen.comic.entity.RoleEntity;
 import com.nettruyen.comic.entity.UserEntity;
 import com.nettruyen.comic.exception.AppException;
 import com.nettruyen.comic.exception.ErrorCode;
 import com.nettruyen.comic.mapper.UserMapper;
-import com.nettruyen.comic.repository.IRoleRepository;
-import com.nettruyen.comic.repository.IUserRepository;
+import com.nettruyen.comic.repository.internal.IRoleRepository;
+import com.nettruyen.comic.repository.internal.IUserRepository;
 import com.nettruyen.comic.service.IUserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

@@ -5,18 +5,23 @@ import com.nettruyen.comic.dto.request.authentication.*;
 import com.nettruyen.comic.dto.response.authentication.AuthenticationResponse;
 import com.nettruyen.comic.dto.response.authentication.IntrospectResponse;
 import com.nettruyen.comic.dto.response.authentication.ResendOtpResponse;
-import com.nettruyen.comic.dto.response.UserResponse;
+import com.nettruyen.comic.dto.response.user.OutboundUserResponse;
+import com.nettruyen.comic.dto.response.user.UserResponse;
 import com.nettruyen.comic.entity.InvalidatedToken;
 import com.nettruyen.comic.entity.RoleEntity;
 import com.nettruyen.comic.entity.UserEntity;
 import com.nettruyen.comic.exception.AppException;
 import com.nettruyen.comic.exception.ErrorCode;
 import com.nettruyen.comic.mapper.UserMapper;
-import com.nettruyen.comic.repository.IInvalidatedRepository;
-import com.nettruyen.comic.repository.IRoleRepository;
-import com.nettruyen.comic.repository.IUserRepository;
+import com.nettruyen.comic.repository.external.IOutboundUserClientRepository;
+import com.nettruyen.comic.repository.internal.IInvalidatedRepository;
+import com.nettruyen.comic.repository.external.IOutboundIdentityClientRepository;
+import com.nettruyen.comic.repository.internal.IRoleRepository;
+import com.nettruyen.comic.repository.internal.IUserRepository;
 import com.nettruyen.comic.service.IAuthenticationService;
 import com.nettruyen.comic.service.IAccountService;
+import com.nettruyen.comic.service.ICloudinaryService;
+import com.nettruyen.comic.util.ConvertorUtil;
 import com.nettruyen.comic.util.OtpGenerator;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -56,6 +61,10 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     IAccountService accountService;
     IRoleRepository roleRepository;
     IInvalidatedRepository invalidatedRepository;
+    ICloudinaryService cloudinaryService;
+
+    IOutboundIdentityClientRepository outboundIdentityClientRepository;
+    IOutboundUserClientRepository outboundUserClientRepository;
 
 
     @NonFinal
@@ -69,6 +78,21 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
     @NonFinal
     @Value("${jwt.signerKey}")
     String SIGNER_KEY;
+
+    @NonFinal
+    @Value("${outbound.identity.client-id}")
+    protected String CLIENT_ID;
+
+    @NonFinal
+    @Value("${outbound.identity.client-secret}")
+    protected String CLIENT_SECRET;
+
+    @NonFinal
+    @Value("${outbound.identity.redirect-uri}")
+    protected String REDIRECT_URI;
+
+    @NonFinal
+    protected final String GRANT_TYPE = "authorization_code";
 
     @Override
     public AuthenticationResponse login(LoginRequest request) {
@@ -304,6 +328,57 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
                 .build();
     }
 
+    @Override
+    public AuthenticationResponse outboundAuthenticate(String code) {
+        try {
+            var response = outboundIdentityClientRepository.exchangeToken(ExchangeTokenRequest.builder()
+                    .code(code)
+                    .clientId(CLIENT_ID)
+                    .clientSecret(CLIENT_SECRET)
+                    .redirectUri(REDIRECT_URI)
+                    .grantType(GRANT_TYPE)
+                    .build());
+
+            log.info("TOKEN RESPONSE {}", response);
+
+            // Dùng chính token đã exchange để get user info
+            var userInfo = outboundUserClientRepository.getUserInfo("json", response.getAccessToken());
+            log.info("USER INFO {}", userInfo);
+
+            // Tải ảnh từ Google
+            String pictureUrl = userInfo.getPicture();
+            String localPictureUrl = cloudinaryService.downloadAndStorePicture(pictureUrl, response.getAccessToken());
+
+            // Onboard user
+            var user = userRepository.findByEmail(userInfo.getEmail());
+            if (user == null) {
+
+                // Set role
+                Set<RoleEntity> roles = new HashSet<>();
+                roleRepository.findByRoleName(RoleEnum.USER).ifPresent(roles::add);
+
+                user = userRepository.save(UserEntity.builder()
+                                .username(ConvertorUtil.convertNameToCode(userInfo.getName()))
+                                .firstName(userInfo.getGivenName())
+                                .lastName(userInfo.getFamilyName())
+                                .email(userInfo.getEmail())
+                                .picture(localPictureUrl)   // Sử dụng url nội bộ
+                                .isActive(1)
+                                .roles(roles)
+                        .build());
+            }
+
+            // Generate token
+            var token = generateToken(user);
+
+
+            return AuthenticationResponse.builder().token(token).build();
+
+        } catch (Exception e) {
+            log.error("Error during token exchange: {}", e.getMessage());
+            throw new AppException(ErrorCode.UNCATEGORIZED);
+        }
+    }
 
     /* === Authentication for JWT === */
 

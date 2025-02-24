@@ -5,7 +5,7 @@ import com.nettruyen.comic.dto.request.authentication.RoleCreationRequest;
 import com.nettruyen.comic.entity.RoleEntity;
 import com.nettruyen.comic.exception.AppException;
 import com.nettruyen.comic.exception.ErrorCode;
-import com.nettruyen.comic.repository.IRoleRepository;
+import com.nettruyen.comic.repository.internal.IRoleRepository;
 import com.nettruyen.comic.service.IRoleService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

@@ -4,7 +4,8 @@ import com.nettruyen.comic.dto.request.authentication.*;
 import com.nettruyen.comic.dto.response.authentication.AuthenticationResponse;
 import com.nettruyen.comic.dto.response.authentication.IntrospectResponse;
 import com.nettruyen.comic.dto.response.authentication.ResendOtpResponse;
-import com.nettruyen.comic.dto.response.UserResponse;
+import com.nettruyen.comic.dto.response.user.OutboundUserResponse;
+import com.nettruyen.comic.dto.response.user.UserResponse;
 import com.nimbusds.jose.JOSEException;
 
 import java.text.ParseException;
@@ -24,4 +25,6 @@ public interface IAuthenticationService {
     IntrospectResponse introspect(IntrospectRequest request);
 
     AuthenticationResponse refreshToken(RefreshTokenRequest request) throws ParseException, JOSEException;
+
+    AuthenticationResponse outboundAuthenticate(String code);
 }

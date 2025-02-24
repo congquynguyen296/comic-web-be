@@ -6,7 +6,8 @@ import com.nettruyen.comic.dto.response.ApiResponse;
 import com.nettruyen.comic.dto.response.authentication.AuthenticationResponse;
 import com.nettruyen.comic.dto.response.authentication.IntrospectResponse;
 import com.nettruyen.comic.dto.response.authentication.ResendOtpResponse;
-import com.nettruyen.comic.dto.response.UserResponse;
+import com.nettruyen.comic.dto.response.user.OutboundUserResponse;
+import com.nettruyen.comic.dto.response.user.UserResponse;
 import com.nettruyen.comic.service.IAuthenticationService;
 import com.nimbusds.jose.JOSEException;
 import jakarta.validation.Valid;
@@ -85,6 +86,14 @@ public class AuthenticationController {
         return ApiResponse.<AuthenticationResponse>builder()
                 .code(200)
                 .result(authenticationService.refreshToken(request))
+                .build();
+    }
+
+    @PostMapping("/outbound/authentication")
+    ApiResponse<AuthenticationResponse> outboundAuthenticate(@RequestParam("code") String code) {
+        return ApiResponse.<AuthenticationResponse>builder()
+                .code(200)
+                .result(authenticationService.outboundAuthenticate(code))
                 .build();
     }
 }

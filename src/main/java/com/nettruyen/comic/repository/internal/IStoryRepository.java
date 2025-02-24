@@ -1,4 +1,4 @@
-package com.nettruyen.comic.repository;
+package com.nettruyen.comic.repository.internal;
 
 import com.nettruyen.comic.entity.StoryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
