@@ -24,4 +24,16 @@ public class CommentEntity extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "chapter_id")
     ChapterEntity chapter;
+
+    @ManyToOne
+    @JoinColumn(name ="parent_id")
+    CommentEntity parent;   // Mỗi một bình luận chỉ có 1 cha
+
+    @Column(name = "depth", nullable = false, columnDefinition = "int default 0")
+    Integer depth;
+
+    public void setParent(CommentEntity parent) {
+        this.parent = parent;
+        this.depth = (parent != null) ? parent.getDepth() + 1 : 0;
+    }
 }

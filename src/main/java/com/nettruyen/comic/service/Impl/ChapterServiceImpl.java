@@ -12,7 +12,7 @@ import com.nettruyen.comic.mapper.StoryMapper;
 import com.nettruyen.comic.repository.internal.IChapterRepository;
 import com.nettruyen.comic.repository.internal.IStoryRepository;
 import com.nettruyen.comic.service.IChapterService;
-import com.nettruyen.comic.util.ScraperData;
+import com.nettruyen.comic.util.ChapterScraper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,7 +29,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class ChapterService implements IChapterService {
+public class ChapterServiceImpl implements IChapterService {
 
     IChapterRepository chapterRepository;
     IStoryRepository storyRepository;
@@ -41,17 +41,20 @@ public class ChapterService implements IChapterService {
     public ChapterResponse createChapter(ChapterCreationRequest request) {
 
         // Prepare data
-        var chapterScraped = ScraperData.scraperChapter(request.getUrl());
+        var chapterScraped = ChapterScraper.scraperChapter(request.getUrl());
         chapterScraped.setStoryId(request.getStoryId());
 
 
         var storyEntityContainChapter = storyRepository.findById(chapterScraped.getStoryId());
         if (storyEntityContainChapter.isEmpty())
-            throw new AppException(ErrorCode.CHAPTER_NOT_EXITS);
+            throw new AppException(ErrorCode.STORY_NOT_EXITS);
 
         // Check xem chapter đã tồn tại chưa qua chapter code
-        if (chapterRepository.findByChapterNumber(chapterScraped.getChapterNumber()) != null)
-            throw new AppException(ErrorCode.CHAPTER_ALREADY_EXITS);
+//        if (chapterRepository.findByChapterNumber(chapterScraped.getChapterNumber()) != null)
+//            throw new AppException(ErrorCode.CHAPTER_ALREADY_EXITS);
+        if (chapterRepository.findByChapterNumberAndStory(chapterScraped.getChapterNumber(), storyEntityContainChapter)
+                != null)
+            throw new AppException(ErrorCode.STORY_ALREADY_EXITS);
 
         try {
             ChapterEntity chapterEntity = chapterMapper.toEntity(chapterScraped);

@@ -345,13 +345,13 @@ public class AuthenticationServiceImpl implements IAuthenticationService {
             var userInfo = outboundUserClientRepository.getUserInfo("json", response.getAccessToken());
             log.info("USER INFO {}", userInfo);
 
-            // Tải ảnh từ Google
-            String pictureUrl = userInfo.getPicture();
-            String localPictureUrl = cloudinaryService.downloadAndStorePicture(pictureUrl, response.getAccessToken());
-
             // Onboard user
             var user = userRepository.findByEmail(userInfo.getEmail());
             if (user == null) {
+
+                // Tải ảnh từ Google lưu vào local (đưa lên cloud sau này)
+                String pictureUrl = userInfo.getPicture();
+                String localPictureUrl = cloudinaryService.downloadAndStorePicture(pictureUrl, response.getAccessToken());
 
                 // Set role
                 Set<RoleEntity> roles = new HashSet<>();

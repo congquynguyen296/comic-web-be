@@ -4,6 +4,9 @@ server:
     context-path: /nettruyen
 
 spring:
+  threads:
+    virtual:
+      enabled: true
   datasource:
     url: ${DBMS_URL:jdbc:mysql://localhost:3306/comic}
     username: ${DBMS_USERNAME:root}

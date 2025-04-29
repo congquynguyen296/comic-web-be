@@ -32,11 +32,11 @@ public class SecurityConfig {
             "/api/stories/**",
             "/api/chapters/**",
             "/api/chapter/**",
+            "/api/comment/**",
+            "/api/comments/**",
+            "/api/admin/scraper",
     };
 
-    @NonFinal
-    @Value("${jwt.signerKey}")
-    String SIGNER_KEY;
 
     CustomJwtDecoder jwtDecoder;
 
